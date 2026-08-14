@@ -1,0 +1,178 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    min-height: 100vh;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+}
+
+.hm-grid-bg {
+    background-image: 
+        linear-gradient(0deg, transparent 24%, rgba(255,255,255,.03) 25%, rgba(255,255,255,.03) 26%, transparent 27%, transparent 74%, rgba(255,255,255,.03) 75%, rgba(255,255,255,.03) 76%, transparent 77%, transparent),
+        linear-gradient(90deg, transparent 24%, rgba(255,255,255,.03) 25%, rgba(255,255,255,.03) 26%, transparent 27%, transparent 74%, rgba(255,255,255,.03) 75%, rgba(255,255,255,.03) 76%, transparent 77%, transparent);
+    background-size: 60px 60px;
+    background-color: var(--bg);
+}
+
+/* ===== SKRYTIE CELEJ HORNEJ LIŠTY V SYSTÉMOCH ===== */
+/* Horná lišta (s tlačidlom Späť a názvom systému) sa v systémoch nechce – necháme len dolné tlačidlo. */
+.hm-topbar {
+    display: none !important;
+}
+
+.hm-wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px 20px;
+}
+
+/* ===== TLAČIDLO „SPÄŤ NA VÝBER SYSTÉMOV“ (DOLNÉ) ===== */
+.hm-back-bottom {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    margin-top: 24px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--muted);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    transition: 0.3s;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.hm-back-bottom:hover {
+    border-color: var(--accent);
+    color: var(--text);
+    box-shadow: 0 0 20px var(--glow);
+}
+
+.hm-back-bottom svg {
+    display: inline-block;
+    vertical-align: middle;
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    stroke: currentColor;
+}
+
+/* ======================================== */
+/* ===== MOBILNÁ RESPONZIVITA ===== */
+/* ======================================== */
+
+@media (max-width: 768px) {
+    .hm-wrap {
+        padding: 16px 12px !important;
+        max-width: 100% !important;
+    }
+
+    .hm-back-bottom {
+        padding: 12px;
+        font-size: 0.85rem;
+        margin-top: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hm-wrap {
+        padding: 10px 8px !important;
+    }
+
+    .hm-back-bottom {
+        padding: 10px;
+        font-size: 0.8rem;
+        margin-top: 12px;
+    }
+
+    /* ===== HLAVNÁ OPRAVA – roztiahnutie .app na celú šírku ===== */
+    .app {
+        max-width: 100% !important;
+        padding: 12px 8px 14px !important;
+        border-radius: 12px !important;
+    }
+
+    .person-block {
+        padding: 12px 10px 8px !important;
+    }
+
+    .date-row {
+        grid-template-columns: 1fr 1fr 1.2fr !important;
+        gap: 4px !important;
+    }
+
+    .date-row select {
+        padding: 10px 4px !important;
+        font-size: 0.85rem !important;
+    }
+
+    .info-box {
+        padding: 12px 14px !important;
+        font-size: 0.8rem !important;
+    }
+
+    .result-block {
+        padding: 14px 12px !important;
+    }
+
+    .result-block p {
+        font-size: 0.85rem !important;
+    }
+
+    .header {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+
+    .lang-selector {
+        align-self: flex-start !important;
+    }
+
+    .gender-toggle {
+        gap: 6px !important;
+    }
+
+    .gender-toggle button {
+        padding: 8px 0 !important;
+        font-size: 0.8rem !important;
+    }
+
+    .live-status-bar {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 6px !important;
+    }
+
+    .live-status-bar .status-pill:last-child {
+        grid-column: span 2 !important;
+    }
+
+    .btn-primary {
+        padding: 12px !important;
+        font-size: 0.9rem !important;
+    }
+
+    .btn-restart {
+        padding: 10px !important;
+        font-size: 0.75rem !important;
+    }
+
+    .refresh-btn {
+        padding: 4px 10px !important;
+        font-size: 0.65rem !important;
+    }
+}

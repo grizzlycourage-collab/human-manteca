@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vzťahový kompas · The Human Maintenance</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #060810;
+            --card: #0d1428;
+            --border: #1e2a4a;
+            --text: #e8edf5;
+            --muted: #6a7a9a;
+            --accent: #f59e0b;
+            --accent2: #ec4899;
+            --glow: rgba(245, 158, 11, 0.15);
+            --glow2: rgba(236, 72, 153, 0.15);
+            --radius: 18px;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .app {
+            max-width: 780px;
+            width: 100%;
+            background: var(--card);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 28px 24px 20px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #f5a623, var(--accent), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo span {
+            display: block;
+            font-size: 0.65rem;
+            font-weight: 400;
+            color: var(--muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            -webkit-text-fill-color: var(--muted);
+        }
+
+        .lang-selector {
+            display: flex;
+            gap: 3px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 30px;
+            padding: 3px;
+            border: 1px solid var(--border);
+        }
+
+        .lang-selector button {
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.25s;
+            text-transform: uppercase;
+        }
+
+        .lang-selector button.active {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 0 20px var(--glow);
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.06), var(--card));
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: 14px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            color: #e2e8f0;
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        .info-box strong {
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 4px;
+            font-size: 0.75rem;
+        }
+
+        .form-section {
+            margin-bottom: 6px;
+        }
+
+        .form-section.hidden {
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--muted);
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            background: #080c1a;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 0.95rem;
+            transition: 0.3s;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--glow);
+        }
+
+        .form-group input::placeholder {
+            color: var(--muted);
+            opacity: 0.4;
+        }
+
+        .person-block {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px 16px 10px;
+            margin-bottom: 16px;
+        }
+
+        .person-block .person-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+
+        .person-block .person-title .icon {
+            margin-right: 6px;
+        }
+
+        .date-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1.4fr;
+            gap: 8px;
+        }
+
+        .date-row select {
+            padding: 11px 8px;
+            background: #080c1a;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 0.9rem;
+            outline: none;
+            transition: 0.3s;
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        .date-row select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--glow);
+        }
+
+        .gender-toggle {
+            display: flex;
+            gap: 8px;
+            background: #080c1a;
+            border-radius: 12px;
+            padding: 3px;
+            border: 1px solid var(--border);
+            margin-top: 4px;
+        }
+
+        .gender-toggle button {
+            flex: 1;
+            padding: 8px 0;
+            border: none;
+            background: transparent;
+            color: var(--muted);
+            font-size: 0.8rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        .gender-toggle button.active {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 0 20px var(--glow);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            margin-top: 6px;
+            box-shadow: 0 0 30px var(--glow);
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.01);
+            box-shadow: 0 0 50px var(--glow);
+        }
+
+        .results-container {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .results-container.active {
+            display: block;
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-block {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px 18px;
+            margin-bottom: 14px;
+            border-left: 3px solid var(--accent);
+        }
+
+        .result-block .title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-block .title .tag {
+            font-size: 0.5rem;
+            color: var(--muted);
+            background: rgba(255, 255, 255, 0.04);
+            padding: 2px 10px;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .result-block p {
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: #d0d8e8;
+            margin-top: 4px;
+        }
+
+        .result-block .highlight {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .result-block .highlight2 {
+            color: var(--accent2);
+            font-weight: 600;
+        }
+
+        .btn-restart {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--muted);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.3s;
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .btn-restart:hover {
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        .footer {
+            margin-top: 24px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            font-size: 0.55rem;
+            color: var(--muted);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .footer strong {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        @media (max-width: 480px) {
+            .app {
+                padding: 16px 12px 14px;
+            }
+
+            .logo h1 {
+                font-size: 1.2rem;
+            }
+
+            .result-block {
+                padding: 14px 12px;
+            }
+
+            .result-block p {
+                font-size: 0.88rem;
+            }
+
+            .date-row {
+                grid-template-columns: 1fr 1fr 1.2fr;
+                gap: 4px;
+            }
+
+            .date-row select {
+                padding: 10px 4px;
+                font-size: 0.85rem;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .lang-selector {
+                align-self: flex-start;
+            }
+
+            .person-block {
+                padding: 12px 10px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app" id="app">
+        <div class="header">
+            <div class="logo">
+                <h1 id="appTitle">Vzťahový kompas</h1>
+                <span id="subBrand">The Human Maintenance</span>
+            </div>
+            <div class="lang-selector" id="langSelector">
+                <button class="active" data-lang="sk">SK</button>
+                <button data-lang="en">EN</button>
+                <button data-lang="de">DE</button>
+                <button data-lang="cz">CZ</button>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <strong id="infoTitle">🧭 Čo spája dvoch ľudí?</strong>
+            <p id="infoText">Vzťahový kompas analyzuje numerologické profily dvoch ľudí a ukazuje, čo ich priťahuje, čo ich rozdeľuje, kde je sexuálna chémia, karmické prepojenie a čo musí každý z nich zmeniť, aby vzťah fungoval. Žiadne čísla v UX, len šokujúco presný výstup.</p>
+        </div>
+
+        <div class="form-section" id="formSection">
+            <!-- Osoba A -->
+            <div class="person-block">
+                <div class="person-title"><span class="icon">🔥</span> <span id="lblPersonA">Osoba A</span></div>
+                <div class="form-group">
+                    <label id="lblNameA">Celé meno a priezvisko</label>
+                    <input type="text" id="fullNameA" placeholder="napr. Július Kováč">
+                </div>
+                <div class="form-group">
+                    <label id="lblBirthA">Dátum narodenia</label>
+                    <div class="date-row">
+                        <select id="birthDayA"><option value="">Deň</option></select>
+                        <select id="birthMonthA">
+                            <option value="">Mesiac</option>
+                            <option value="1">Január</option><option value="2">Február</option>
+                            <option value="3">Marec</option><option value="4">Apríl</option>
+                            <option value="5">Máj</option><option value="6">Jún</option>
+                            <option value="7">Júl</option><option value="8">August</option>
+                            <option value="9">September</option><option value="10">Október</option>
+                            <option value="11">November</option><option value="12">December</option>
+                        </select>
+                        <select id="birthYearA"><option value="">Rok</option></select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label id="lblGenderA">Polarita</label>
+                    <div class="gender-toggle" data-person="A">
+                        <button class="active" data-gender="m">⚡ Muž</button>
+                        <button data-gender="f">🌸 Žena</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Osoba B -->
+            <div class="person-block">
+                <div class="person-title"><span class="icon">🌊</span> <span id="lblPersonB">Osoba B</span></div>
+                <div class="form-group">
+                    <label id="lblNameB">Celé meno a priezvisko</label>
+                    <input type="text" id="fullNameB" placeholder="napr. Jana Kováčová">
+                </div>
+                <div class="form-group">
+                    <label id="lblBirthB">Dátum narodenia</label>
+                    <div class="date-row">
+                        <select id="birthDayB"><option value="">Deň</option></select>
+                        <select id="birthMonthB">
+                            <option value="">Mesiac</option>
+                            <option value="1">Január</option><option value="2">Február</option>
+                            <option value="3">Marec</option><option value="4">Apríl</option>
+                            <option value="5">Máj</option><option value="6">Jún</option>
+                            <option value="7">Júl</option><option value="8">August</option>
+                            <option value="9">September</option><option value="10">Október</option>
+                            <option value="11">November</option><option value="12">December</option>
+                        </select>
+                        <select id="birthYearB"><option value="">Rok</option></select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label id="lblGenderB">Polarita</label>
+                    <div class="gender-toggle" data-person="B">
+                        <button class="active" data-gender="m">⚡ Muž</button>
+                        <button data-gender="f">🌸 Žena</button>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-primary" id="btnStart">✦ Spočítať vzťah</button>
+        </div>
+
+        <div class="results-container" id="resultsContainer">
+            <div id="outputWrapper"></div>
+            <button class="btn-restart" id="btnRestart">↺ Nový vzťah</button>
+        </div>
+
+        <div class="footer">
+            <strong>Grizzly Courage</strong> · The Human Maintenance
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ================================================================
+            // 1. JAZYKOVÉ PREKLADY
+            // ================================================================
+            const LANG = {
+                sk: {
+                    title: 'Vzťahový kompas',
+                    brand: 'The Human Maintenance',
+                    infoTitle: '🧭 Čo spája dvoch ľudí?',
+                    infoText: 'Vzťahový kompas analyzuje numerologické profily dvoch ľudí a ukazuje, čo ich priťahuje, čo ich rozdeľuje, kde je sexuálna chémia, karmické prepojenie a čo musí každý z nich zmeniť, aby vzťah fungoval. Žiadne čísla v UX, len šokujúco presný výstup.',
+                    personA: 'Osoba A',
+                    personB: 'Osoba B',
+                    nameA: 'Celé meno a priezvisko (A)',
+                    nameB: 'Celé meno a priezvisko (B)',
+                    namePlaceholderA: 'napr. Július Kováč',
+                    namePlaceholderB: 'napr. Jana Kováčová',
+                    birthA: 'Dátum narodenia (A)',
+                    birthB: 'Dátum narodenia (B)',
+                    optDay: 'Deň',
+                    optMonth: 'Mesiac',
+                    optYear: 'Rok',
+                    genderA: 'Polarita (A)',
+                    genderB: 'Polarita (B)',
+                    male: '⚡ Muž',
+                    female: '🌸 Žena',
+                    start: '✦ Spočítať vzťah',
+                    restart: '↺ Nový vzťah',
+                    alert: 'Prosím, vyplňte obe mená a dátumy narodenia.',
+                    parts: {
+                        attraction: '🔥 Príťažlivosť a chémia',
+                        bond: '❤️ Čo vás spája',
+                        conflict: '💥 Čo vás rozdeľuje',
+                        karma: '🌀 Prečo ste sa stretli',
+                        hisWork: '⚔️ Čo musí zlepšiť on',
+                        herWork: '🛡️ Čo musí zlepšiť ona',
+                        potential: '🌟 Spoločný potenciál'
+                    },
+                    tags: {
+                        attraction: 'túžba a sex',
+                        bond: 'duševné puto',
+                        conflict: 'výzvy a hádky',
+                        karma: 'karmické prepojenie',
+                        hisWork: 'jeho práca na sebe',
+                        herWork: 'jej práca na sebe',
+                        potential: 'spoločná budúcnosť'
+                    }
+                },
+                en: {
+                    title: 'Relationship Compass',
+                    brand: 'The Human Maintenance',
+                    infoTitle: '🧭 What connects two people?',
+                    infoText: 'The Relationship Compass analyzes the numerological profiles of two people and shows what attracts them, what divides them, where the sexual chemistry is, karmic connection, and what each needs to change for the relationship to work. No numbers in UX, just shockingly accurate output.',
+                    personA: 'Person A',
+                    personB: 'Person B',
+                    nameA: 'Full Name (A)',
+                    nameB: 'Full Name (B)',
+                    namePlaceholderA: 'e.g. John Doe',
+                    namePlaceholderB: 'e.g. Jane Doe',
+                    birthA: 'Date of Birth (A)',
+                    birthB: 'Date of Birth (B)',
+                    optDay: 'Day',
+                    optMonth: 'Month',
+                    optYear: 'Year',
+                    genderA: 'Polarity (A)',
+                    genderB: 'Polarity (B)',
+                    male: '⚡ Male',
+                    female: '🌸 Female',
+                    start: '✦ Calculate Relationship',
+                    restart: '↺ New Relationship',
+                    alert: 'Please fill in both names and dates of birth.',
+                    parts: {
+                        attraction: '🔥 Attraction & Chemistry',
+                        bond: '❤️ What Connects You',
+                        conflict: '💥 What Divides You',
+                        karma: '🌀 Why You Met',
+                        hisWork: '⚔️ What He Must Improve',
+                        herWork: '🛡️ What She Must Improve',
+                        potential: '🌟 Shared Potential'
+                    },
+                    tags: {
+                        attraction: 'desire & sex',
+                        bond: 'soul bond',
+                        conflict: 'challenges & fights',
+                        karma: 'karmic connection',
+                        hisWork: 'his inner work',
+                        herWork: 'her inner work',
+                        potential: 'shared future'
+                    }
+                },
+                de: {
+                    title: 'Beziehungskompass',
+                    brand: 'The Human Maintenance',
+                    infoTitle: '🧭 Was verbindet zwei Menschen?',
+                    infoText: 'Der Beziehungskompass analysiert die numerologischen Profile zweier Menschen und zeigt, was sie anzieht, was sie trennt, wo die sexuelle Chemie ist, die karmische Verbindung und was jeder von ihnen ändern muss, damit die Beziehung funktioniert. Keine Zahlen im UX, nur schockierend genaue Ausgabe.',
+                    personA: 'Person A',
+                    personB: 'Person B',
+                    nameA: 'Vollständiger Name (A)',
+                    nameB: 'Vollständiger Name (B)',
+                    namePlaceholderA: 'z.B. Julius Kováč',
+                    namePlaceholderB: 'z.B. Jana Kováčová',
+                    birthA: 'Geburtsdatum (A)',
+                    birthB: 'Geburtsdatum (B)',
+                    optDay: 'Tag',
+                    optMonth: 'Monat',
+                    optYear: 'Jahr',
+                    genderA: 'Polarität (A)',
+                    genderB: 'Polarität (B)',
+                    male: '⚡ Männlich',
+                    female: '🌸 Weiblich',
+                    start: '✦ Beziehung berechnen',
+                    restart: '↺ Neue Beziehung',
+                    alert: 'Bitte füllen Sie beide Namen und Geburtsdaten aus.',
+                    parts: {
+                        attraction: '🔥 Anziehung & Chemie',
+                        bond: '❤️ Was euch verbindet',
+                        conflict: '💥 Was euch trennt',
+                        karma: '🌀 Warum ihr euch traft',
+                        hisWork: '⚔️ Was er verbessern muss',
+                        herWork: '🛡️ Was sie verbessern muss',
+                        potential: '🌟 Gemeinsames Potenzial'
+                    },
+                    tags: {
+                        attraction: 'Verlangen & Sex',
+                        bond: 'Seelenband',
+                        conflict: 'Herausforderungen & Streit',
+                        karma: 'karmische Verbindung',
+                        hisWork: 'seine innere Arbeit',
+                        herWork: 'ihre innere Arbeit',
+                        potential: 'gemeinsame Zukunft'
+                    }
+                },
+                cz: {
+                    title: 'Kompas vztahů',
+                    brand: 'The Human Maintenance',
+                    infoTitle: '🧭 Co spojuje dva lidi?',
+                    infoText: 'Kompas vztahů analyzuje numerologické profily dvou lidí a ukazuje, co je přitahuje, co je rozděluje, kde je sexuální chemie, karmické propojení a co musí každý z nich změnit, aby vztah fungoval. Žádná čísla v UX, jen šokujícně přesný výstup.',
+                    personA: 'Osoba A',
+                    personB: 'Osoba B',
+                    nameA: 'Celé jméno a příjmení (A)',
+                    nameB: 'Celé jméno a příjmení (B)',
+                    namePlaceholderA: 'např. Julius Kováč',
+                    namePlaceholderB: 'např. Jana Kováčová',
+                    birthA: 'Datum narození (A)',
+                    birthB: 'Datum narození (B)',
+                    optDay: 'Den',
+                    optMonth: 'Měsíc',
+                    optYear: 'Rok',
+                    genderA: 'Polarita (A)',
+                    genderB: 'Polarita (B)',
+                    male: '⚡ Muž',
+                    female: '🌸 Žena',
+                    start: '✦ Spočítat vztah',
+                    restart: '↺ Nový vztah',
+                    alert: 'Prosím, vyplňte obě jména a data narození.',
+                    parts: {
+                        attraction: '🔥 Přitažlivost a chemie',
+                        bond: '❤️ Co vás spojuje',
+                        conflict: '💥 Co vás rozděluje',
+                        karma: '🌀 Proč jste se potkali',
+                        hisWork: '⚔️ Co musí zlepšit on',
+                        herWork: '🛡️ Co musí zlepšit ona',
+                        potential: '🌟 Společný potenciál'
+                    },
+                    tags: {
+                        attraction: 'touha a sex',
+                        bond: 'duševní pouto',
+                        conflict: 'výzvy a hádky',
+                        karma: 'karmické propojení',
+                        hisWork: 'jeho práce na sobě',
+                        herWork: 'její práce na sobě',
+                        potential: 'společná budoucnost'
+                    }
+                }
+            };
+
+            // ================================================================
+            // 2. NUMEROLOGICKÉ FUNKCIE (kompletné)
+            // ================================================================
+            function numerologySum(str) {
+                let sum = 0;
+                for (let ch of str) {
+                    let d = parseInt(ch);
+                    if (!isNaN(d)) sum += d;
+                }
+                while (sum > 9 && sum !== 11 && sum !== 22 && sum !== 33) {
+                    sum = String(sum).split('').reduce((a, b) => parseInt(a) + parseInt(b), 0);
+                }
+                return sum;
+            }
+
+            function nameToNumber(name) {
+                const map = {
+                    'a': 1, 'á': 1, 'ä': 1, 'b': 2, 'c': 3, 'č': 3, 'd': 4, 'ď': 4,
+                    'e': 5, 'é': 5, 'ě': 5, 'f': 6, 'g': 7, 'h': 8, 'ch': 8, 'i': 9,
+                    'í': 9, 'j': 1, 'k': 2, 'l': 3, 'm': 4, 'n': 5, 'ň': 5, 'o': 6,
+                    'ó': 6, 'ô': 6, 'p': 7, 'q': 8, 'r': 9, 'ř': 9, 's': 1, 'š': 1,
+                    't': 2, 'ť': 2, 'u': 3, 'ú': 3, 'ů': 3, 'v': 4, 'w': 5, 'x': 6,
+                    'y': 7, 'ý': 7, 'z': 8, 'ž': 8
+                };
+                let clean = name.toLowerCase().replace(/[^a-záäčďéěíňóôřšťúůýž]/g, '');
+                let sum = 0;
+                for (let ch of clean) {
+                    if (map[ch]) sum += map[ch];
+                }
+                while (sum > 9 && sum !== 11 && sum !== 22 && sum !== 33) {
+                    sum = String(sum).split('').reduce((a, b) => parseInt(a) + parseInt(b), 0);
+                }
+                return sum;
+            }
+
+            function getVowelsSum(name) {
+                const vowels = 'aeiouyáäéíóôúý';
+                let sum = 0;
+                let clean = name.toLowerCase().replace(/[^a-záäčďéěíňóôřšťúůýž]/g, '');
+                for (let ch of clean) {
+                    if (vowels.includes(ch)) {
+                        const map = {
+                            'a': 1, 'á': 1, 'ä': 1, 'e': 5, 'é': 5, 'ě': 5,
+                            'i': 9, 'í': 9, 'o': 6, 'ó': 6, 'ô': 6, 'u': 3,
+                            'ú': 3, 'ů': 3, 'y': 7, 'ý': 7
+                        };
+                        sum += map[ch] || 0;
+                    }
+                }
+                while (sum > 9 && sum !== 11 && sum !== 22 && sum !== 33) {
+                    sum = String(sum).split('').reduce((a, b) => parseInt(a) + parseInt(b), 0);
+                }
+                return sum;
+            }
+
+            function getConsonantsSum(name) {
+                const vowels = 'aeiouyáäéíóôúý';
+                let sum = 0;
+                let clean = name.toLowerCase().replace(/[^a-záäčďéěíňóôřšťúůýž]/g, '');
+                for (let ch of clean) {
+                    if (!vowels.includes(ch)) {
+                        const map = {
+                            'b': 2, 'c': 3, 'č': 3, 'd': 4, 'ď': 4, 'f': 6,
+                            'g': 7, 'h': 8, 'ch': 8, 'j': 1, 'k': 2, 'l': 3,
+                            'm': 4, 'n': 5, 'ň': 5, 'p': 7, 'q': 8, 'r': 9,
+                            'ř': 9, 's': 1, 'š': 1, 't': 2, 'ť': 2, 'v': 4,
+                            'w': 5, 'x': 6, 'z': 8, 'ž': 8
+                        };
+                        sum += map[ch] || 0;
+                    }
+                }
+                while (sum > 9 && sum !== 11 && sum !== 22 && sum !== 33) {
+                    sum = String(sum).split('').reduce((a, b) => parseInt(a) + parseInt(b), 0);
+                }
+                return sum;
+            }
+
+            function getAdjustedDate(year, month, day, daysOffset) {
+                const d = new Date(year, month - 1, day);
+                d.setDate(d.getDate() + daysOffset);
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const dd = String(d.getDate()).padStart(2, '0');
+                return `${y}${m}${dd}`;
+            }
+
+            function getBirthdayNumber(day) {
+                return numerologySum(String(day));
+            }
+
+            function getChallenge(day, month) {
+                const diff = Math.abs(parseInt(day) - parseInt(month));
+                return numerologySum(String(diff));
+            }
+
+            function getMaturity(lifePath, destiny) {
+                return numerologySum(String(lifePath + destiny));
+            }
+
+            function getKarmicDebt(number) {
+                const debts = [13, 14, 16, 19];
+                let num = number;
+                while (num > 9 && num !== 11 && num !== 22 && num !== 33) {
+                    num = String(num).split('').reduce((a, b) => parseInt(a) + parseInt(b), 0);
+                }
+                // kontrola pôvodného čísla
+                const original = number;
+                let debt = null;
+                if (original === 13 || original === 14 || original === 16 || original === 19) {
+                    debt = original;
+                }
+                // ak nie, skúsime redukovať a pozrieť medzivýsledky
+                if (!debt) {
+                    let temp = original;
+                    while (temp > 9 && temp !== 11 && temp !== 22 && temp !== 33) {
+                        const s = String(temp);
+                        if (s.length === 2) {
+                            const a = parseInt(s[0]);
+                            const b = parseInt(s[1]);
+                            const sum = a + b;
+                            if (sum === 13 || sum === 14 || sum === 16 || sum === 19) {
+                                debt = sum;
+                                break;
+                            }
+                            temp = sum;
+                        } else {
+                            break;
+                        }
+                    }
+                }
+                return debt;
+            }
+
+            function getHiddenPassions(name) {
+                const map = {
+                    'a': 1, 'á': 1, 'ä': 1, 'b': 2, 'c': 3, 'č': 3, 'd': 4, 'ď': 4,
+                    'e': 5, 'é': 5, 'ě': 5, 'f': 6, 'g': 7, 'h': 8, 'ch': 8, 'i': 9,
+                    'í': 9, 'j': 1, 'k': 2, 'l': 3, 'm': 4, 'n': 5, 'ň': 5, 'o': 6,
+                    'ó': 6, 'ô': 6, 'p': 7, 'q': 8, 'r': 9, 'ř': 9, 's': 1, 'š': 1,
+                    't': 2, 'ť': 2, 'u': 3, 'ú': 3, 'ů': 3, 'v': 4, 'w': 5, 'x': 6,
+                    'y': 7, 'ý': 7, 'z': 8, 'ž': 8
+                };
+                let clean = name.toLowerCase().replace(/[^a-záäčďéěíňóôřšťúůýž]/g, '');
+                const counts = {};
+                for (let ch of clean) {
+                    if (map[ch]) {
+                        const num = map[ch];
+                        counts[num] = (counts[num] || 0) + 1;
+                    }
+                }
+                let maxCount = 0;
+                let passions = [];
+                for (let num in counts) {
+                    if (counts[num] > maxCount) {
+                        maxCount = counts[num];
+                        passions = [parseInt(num)];
+                    } else if (counts[num] === maxCount) {
+                        passions.push(parseInt(num));
+                    }
+                }
+                return passions;
+            }
+
+            function getSubconsciousSelf(name) {
+                const consonants = getConsonantsSum(name);
+                // podvedomé ja je redukcia spoluhlások na 1-9
+                let sub = consonants;
+                while (sub > 9 && sub !== 11 && sub !== 22 && sub !== 33) {
+                    sub = String(sub).split('').reduce((a, b) => parseInt(a) + parseInt(b), 0);
+                }
+                return sub;
+            }
+
+            // ================================================================
+            // 3. GENERÁTORY TEXTU PRE VZŤAH
+            // ================================================================
+
+            // ---- PRÍŤAŽLIVOSŤ A CHÉMIA ----
+            function generateAttraction(lpA, lpB, soulA, soulB, persA, persB) {
+                const sum = numerologySum(String(lpA + lpB));
+                const diff = Math.abs(lpA - lpB);
+                const soulDiff = Math.abs(soulA - soulB);
+                const persDiff = Math.abs(persA - persB);
+
+                let text = '';
+                // Celková chémia
+                if (sum === 2 || sum === 4 || sum === 6 || sum === 8) {
+                    text += 'Medzi vami je silná, prirodzená chémia. Vaše energie sa dopĺňajú ako dve polovice jedného celku. Pritiahli ste sa bez toho, aby ste museli rozmýšľať – proste to tam bolo. ';
+                } else if (sum === 1 || sum === 5 || sum === 7) {
+                    text += 'Vaša príťažlivosť je intenzívna, až výbušná. Je v tom iskra, ktorá nehasne – ale občas aj popáli. Ste ako oheň a voda – priťahujete sa, ale aj odpudzujete. ';
+                } else if (sum === 3 || sum === 9) {
+                    text += 'Vaša chémia je hlboká a duchovná. Nie je to len fyzická príťažlivosť – je to prepojenie na úrovni duše. Cítite sa, ako by ste sa poznali celé životy. ';
+                } else {
+                    text += 'Vaša príťažlivosť je jemná, ale vytrvalá. Nie je to búrka, je to príliv – pomaly, ale isto vás to k sebe ťahá. A keď ste spolu, je to ako domov. ';
+                }
+
+                // Sexuálna chémia (soul + personality)
+                const chem = numerologySum(String(soulA + soulB + persA + persB));
+                if (chem === 1 || chem === 5 || chem === 8) {
+                    text += 'Sexuálne napätie medzi vami je elektrizujúce. Je v tom dravosť a túžba, ktorá sa dá len ťažko ovládať. Keď ste sami, iskry lietajú. ';
+                } else if (chem === 2 || chem === 6) {
+                    text += 'Vaša intimita je jemná a hlboká. Nie je o divokosti, ale o dôvere a blízkosti. Sex je pre vás spôsob, ako sa spojiť na úrovni, ktorá presahuje fyzicko. ';
+                } else if (chem === 3 || chem === 9) {
+                    text += 'Vaša sexuálna chémia je tvorivá a dobrodružná. Radi skúšate nové veci, experimentujete – a nikdy sa nenudíte. Je v tom radosť a hravosť, ktorá vás drží pri sebe. ';
+                } else if (chem === 4 || chem === 7) {
+                    text += 'Vaša intimita je o hĺbke a premyslenosti. Nie je to povrchné – každý dotyk má význam. Ste dvaja, ktorí vedia čítať telo druhého bez slov. ';
+                } else {
+                    text += 'Vaša fyzická chémia je stabilná a uspokojujúca. Nie je to vášnivá búrka, ale je to oheň, ktorý nikdy nezhasne. A to je niekedy viac, než divoká iskra. ';
+                }
+
+                // Rozdiely – napätie
+                if (diff >= 4) {
+                    text += 'Vaše odlišnosti vás priťahujú – ste fascinovaní tým, čo ten druhý má a vy nie. Ale pozor: to, čo vás priťahuje, vás môže aj rozdeliť. '
+                }
+                if (soulDiff <= 2) {
+                    text += 'Vaše duše túžia po podobných veciach – to vytvára hlboké porozumenie. Cítite sa navzájom vnímaní bez slov. '
+                } else {
+                    text += 'Vaše túžby sú odlišné – jeden túži po stabilite, druhý po dobrodružstve. Práve tento rozdiel vás udržuje v napätí a záujme. '
+                }
+                if (persDiff <= 2) {
+                    text += 'Navonok pôsobíte podobne – ľudia vás vnímajú ako dobre zladený pár. Vaše masky sú kompatibilné. '
+                } else {
+                    text += 'Navonok ste odlišní – jeden je tichší, druhý výraznejší. Táto odlišnosť vás robí zaujímavými pre okolie. '
+                }
+
+                return text;
+            }
+
+            // ---- ČO VÁS SPÁJA ----
+            function generateBond(lpA, lpB, destA, destB, soulA, soulB) {
+                const sumLP = numerologySum(String(lpA + lpB));
+                const sumDest = numerologySum(String(destA + destB));
+                const sumSoul = numerologySum(String(soulA + soulB));
+
+                let text = '';
+                // Spoločná životná cesta
+                if (sumLP === 2 || sumLP === 4 || sumLP === 6 || sumLP === 8) {
+                    text += 'Vaše životné cesty sú v harmónii. Obaja smerujete podobným smerom – k stabilite, k budovaniu, k hlbokým vzťahom. Spolu ste silnejší. ';
+                } else if (sumLP === 1 || sumLP === 5 || sumLP === 7) {
+                    text += 'Vaše životné cesty sa navzájom výzvajú. Jeden je kotva, druhý vietor. Spolu vytvárate dynamiku, ktorá vás oboch posúva ďalej. ';
+                } else if (sumLP === 3 || sumLP === 9) {
+                    text += 'Vaše životné cesty sú o tvorivosti a duchovne. Ste spolupútnici na ceste objavovania – či už je to umenie, myšlienky alebo hlbšie zmysly. ';
+                } else {
+                    text += 'Vaše životné cesty sú rôzne, ale nie protichodné. Každý prinášate niečo, čo tomu druhému chýba – a práve to vás spája. ';
+                }
+
+                // Spoločný osud
+                if (sumDest === 3 || sumDest === 6 || sumDest === 9) {
+                    text += 'Váš spoločný osud je o láske, kreativite a službe. Spolu máte potenciál vytvárať niečo, čo presahuje vás samotných. '
+                } else if (sumDest === 1 || sumDest === 8) {
+                    text += 'Váš spoločný osud je o sile a vedení. Ste rodení lídri, ktorí spolu dokážu presadiť veľké veci – ak sa naučíte spolupracovať. '
+                } else if (sumDest === 2 || sumDest === 4) {
+                    text += 'Váš spoločný osud je o budovaní pevných základov. Ste tím, ktorý vytvára niečo trvalé – rodinu, domov, spoločné dielo. '
+                } else {
+                    text += 'Váš spoločný osud je o hľadaní a objavovaní. Spolu ste na ceste, ktorá vás oboch mení – a to je to, čo vás drží pri sebe. '
+                }
+
+                // Duševné prepojenie
+                if (sumSoul === 2 || sumSoul === 6 || sumSoul === 9) {
+                    text += 'Vaše duše sú prepojené na úrovni, ktorú slová nedokážu opísať. Cítite jeden druhého na diaľku, viete, čo ten druhý cíti. Toto je vzácne. '
+                } else if (sumSoul === 1 || sumSoul === 8) {
+                    text += 'Vaše duše sú nezávislé, ale navzájom sa rešpektujú. Potrebujete si nechať priestor, ale keď ste spolu, je to ako návrat domov. '
+                } else if (sumSoul === 3 || sumSoul === 5) {
+                    text += 'Vaše duše túžia po radosti a slobode. Spolu objavujete svet, smejete sa, tvoríte. Vaše prepojenie je ľahké a oslobodzujúce. '
+                } else {
+                    text += 'Vaše duševné prepojenie je hlboké a premyslené. Nepatríte k tým, ktorí hovoria veľa – ale vaša vzájomná prítomnosť hovorí za všetko. '
+                }
+
+                return text;
+            }
+
+            // ---- ČO VÁS ROZDEĽUJE ----
+            function generateConflict(lpA, lpB, destA, destB, challengeA, challengeB) {
+                const diffLP = Math.abs(lpA - lpB);
+                const diffDest = Math.abs(destA - destB);
+                const sumChall = numerologySum(String(challengeA + challengeB));
+
+                let text = '';
+                // Hlavný konflikt
+                if (diffLP >= 4) {
+                    text += 'Vaše životné smery sú veľmi odlišné. Ty (A) potrebuješ stabilitu, on/ona (B) potrebuje slobodu – alebo naopak. Toto je vaša hlavná trenica. Budete sa musieť naučiť rešpektovať, že nie ste rovnakí, a nájsť spoločnú reč. '
+                } else if (diffLP >= 2) {
+                    text += 'Vaše životné smery sa líšia, ale nie sú protichodné. Problémom je, že každý z vás má iné tempo – jeden chce ísť rýchlo, druhý pomaly. Nájdite spoločné tempo. '
+                } else {
+                    text += 'Vaše životné smery sú podobné, ale práve preto sa môžete trieť o detaily. Malé veci vás vedia vytočiť viac, než veľké rozdiely. '
+                }
+
+                // Osudové rozdiely
+                if (diffDest >= 4) {
+                    text += 'Vaše životné ciele sú veľmi odlišné. Jeden chce kariéru, druhý rodinu – alebo jeden chce jednoduchosť, druhý komplexnosť. Musíte si sadnúť a povedať si, čo naozaj chcete – a či to vôbec môže fungovať. '
+                } else if (diffDest >= 2) {
+                    text += 'Vaše ciele sú trochu iné, ale dajú sa zladiť. Problém je, keď sa začnete porovnávať. Každý z vás je iný – a to je dobre. '
+                } else {
+                    text += 'Vaše ciele sú podobné, ale spôsob, akým ich chcete dosiahnuť, je iný. Toto je zdrojom vašich najčastejších hádok. '
+                }
+
+                // Spoločná výzva
+                if (sumChall === 1 || sumChall === 8) {
+                    text += 'Vaša spoločná výzva je naučiť sa spolupracovať namiesto súťaženia. Obaja ste silné osobnosti – ale ak budete bojovať proti sebe, prehráte obaja. '
+                } else if (sumChall === 2 || sumChall === 6) {
+                    text += 'Vaša spoločná výzva je naučiť sa dôverovať si. Obaja máte tendenciu skrývať svoje pocity a potom vybuchnúť. Skúste byť k sebe úprimnejší. '
+                } else if (sumChall === 3 || sumChall === 5) {
+                    text += 'Vaša spoločná výzva je naučiť sa byť trpezliví. Obaja chcete veci hneď a teraz – ale vzťahy potrebujú čas. '
+                } else if (sumChall === 4 || sumChall === 7) {
+                    text += 'Vaša spoločná výzva je naučiť sa otvoriť sa. Obaja máte tendenciu uzatvárať sa do seba – ale ak sa neotvoríte, vzťah zostane na povrchu. '
+                } else {
+                    text += 'Vaša spoločná výzva je nájsť rovnováhu medzi nezávislosťou a blízkosťou. Potrebujete jeden druhého, ale zároveň potrebujete svoj vlastný priestor. '
+                }
+
+                return text;
+            }
+
+            // ---- PREČO STE SA STRETLI ----
+            function generateKarma(lpA, lpB, destA, destB, soulA, soulB, karmicA, karmicB) {
+                const sumLP = numerologySum(String(lpA + lpB));
+                const sumDest = numerologySum(String(destA + destB));
+                const sumSoul = numerologySum(String(soulA + soulB));
+
+                let text = '';
+                // Karmické prepojenie
+                if (karmicA && karmicB) {
+                    text += 'Obaja máte karmické dlhy – a stretli ste sa, aby ste ich spoločne vyriešili. Tento vzťah nie je náhoda. Ste tu preto, aby ste sa jeden od druhého naučili niečo dôležité – čo ste si nechceli priznať. '
+                } else if (karmicA || karmicB) {
+                    text += 'Jeden z vás má karmický dlh, ktorý sa v tomto vzťahu prejavuje. Ten druhý je tu ako zrkadlo – ukazuje vám, čo musíte uzavrieť. Je to intenzívne, ale potrebné. '
+                }
+
+                // Prečo práve teraz
+                if (sumLP === 2 || sumLP === 4 || sumLP === 6) {
+                    text += 'Stretli ste sa, pretože obaja potrebujete niekoho, kto vás uzemní. Ste dvaja ľudia, ktorí hľadajú stabilitu – a našli ju v sebe navzájom. '
+                } else if (sumLP === 1 || sumLP === 8) {
+                    text += 'Stretli ste sa, pretože obaja ste silné osobnosti. Potrebujete niekoho, kto vám vydrží – a kto vás nenechá vyhorieť. Ste si navzájom kotvou aj vetrom. '
+                } else if (sumLP === 3 || sumLP === 5) {
+                    text += 'Stretli ste sa, pretože obaja túžite po radosti a dobrodružstve. Vaša spoločná cesta je o objavovaní a smiechu – ale aj o tom, že sa navzájom naučíte zostať pri sebe. '
+                } else if (sumLP === 7 || sumLP === 9) {
+                    text += 'Stretli ste sa, pretože obaja hľadáte hlbší zmysel. Nie ste tu náhodou – ste na duchovnej ceste, ktorá vás spojila v správny čas na správnom mieste. '
+                } else {
+                    text += 'Stretli ste sa, pretože vás k sebe niečo neodolateľne priťahovalo – aj keď ste tomu nerozumeli. Teraz už viete, že to nebola náhoda. '
+                }
+
+                // Emocionálne prepojenie
+                if (sumSoul === 2 || sumSoul === 6 || sumSoul === 9) {
+                    text += 'Na úrovni duše ste sa spoznali okamžite. Cítili ste, že toto je niekto výnimočný. A mali ste pravdu. '
+                } else if (sumSoul === 1 || sumSoul === 8) {
+                    text += 'Na úrovni duše ste si boli na začiatku cudzí – ale postupne ste objavili, že máte viac spoločného, než ste čakali. '
+                } else {
+                    text += 'Vaše duševné prepojenie sa vyvíjalo postupne. Nebola to láska na prvý pohľad, ale na prvý rozhovor, na prvý smiech, na prvý moment, keď ste si uvedomili, že ten druhý vás naozaj vidí. '
+                }
+
+                return text;
+            }
+
+            // ---- ČO MUSÍ ZLEPŠIŤ ON / ONA ----
+            function generateWork(gender, lp, dest, soul, pers, challenge) {
+                const base = {
+                    m: {
+                        1: 'On musí sa naučiť, že nie je stredobodom sveta. Jeho sila je v tom, že vie viesť – ale musí sa naučiť aj počúvať. Jeho ego je jeho najväčším nepriateľom.',
+                        2: 'On musí sa naučiť vyjadrovať svoje pocity. Jeho ticho je často vnímané ako chlad – ale on len nevie, ako povedať, čo cíti. Musí sa naučiť, že zraniteľnosť nie je slabosť.',
+                        3: 'On musí sa naučiť, že nie všetko je o ňom. Jeho potreba pozornosti je veľká – ale ak ju nebude vedieť regulovať, môže tým svoj vzťah zničiť. Musí sa naučiť počúvať viac, než hovoriť.',
+                        4: 'On musí sa naučiť pustiť kontrolu. Jeho potreba mať všetko pod palcom dusí druhého. Musí sa naučiť, že nie všetko sa dá naplánovať – a že aj chaos je súčasťou života.',
+                        5: 'On musí sa naučiť zostať. Jeho túžba po slobode je silná – ale ak neustále uniká, nikdy nevytvorí niečo trvalé. Musí sa naučiť, že sloboda nie je v úteku, ale v prijatí.',
+                        6: 'On musí sa naučiť milovať aj seba. Jeho starostlivosť o druhých je obdivuhodná – ale ak sa zabúda, vyhorí. Musí sa naučiť, že aj on si zaslúži lásku a pozornosť.',
+                        7: 'On musí sa naučiť otvoriť sa. Jeho myseľ je jeho pevnosťou – ale aj jeho väzením. Musí sa naučiť, že nie všetko sa dá pochopiť rozumom – a že niekedy stačí len cítiť.',
+                        8: 'On musí sa naučiť pokore. Jeho úspech a sila sú impozantné – ale ak ich použije na ovládanie, stratí to, čo je naozaj dôležité. Musí sa naučiť, že skutočná moc je v službe.',
+                        9: 'On musí sa naučiť, že nie je spasiteľom sveta. Jeho potreba pomáhať je veľká – ale ak sa obetuje príliš, zničí seba aj vzťah. Musí sa naučiť, že aj on má právo na svoje hranice.'
+                    },
+                    f: {
+                        1: 'Ona musí sa naučiť, že nie je povinná byť vždy silná. Jej nezávislosť je obdivuhodná – ale ak nikoho nepustí dnu, zostane sama. Musí sa naučiť prijímať pomoc.',
+                        2: 'Ona musí sa naučiť hovoriť nahlas. Jej jemnosť je jej darom – ale ak vždy mlčí, jej potreby zostanú nepočuté. Musí sa naučiť, že jej hlas má váhu.',
+                        3: 'Ona musí sa naučiť, že nie je povinná byť stále šťastná. Jej optimizmus je nákazlivý – ale ak potláča svoj smútok, stáva sa povrchnou. Musí sa naučiť prijať aj svoju temnotu.',
+                        4: 'Ona musí sa naučiť, že nie všetko musí byť dokonalé. Jej snaha o poriadok je pochopiteľná – ale ak sa nevie uvoľniť, vyhorí. Musí sa naučiť, že aj nedokonalosť je krásna.',
+                        5: 'Ona musí sa naučiť, že zmena nie je jediná cesta. Jej túžba po dobrodružstve je inšpiratívna – ale ak neustále hľadá nové, nikdy nenájde to pravé. Musí sa naučiť zostať.',
+                        6: 'Ona musí sa naučiť, že nie je zodpovedná za šťastie všetkých. Jej starostlivosť je jej darom – ale ak na seba zabúda, stáva sa obeťou. Musí sa naučiť postaviť sa na prvé miesto.',
+                        7: 'Ona musí sa naučiť, že nie všetko je potrebné analyzovať. Jej myseľ je jej silou – ale ak sa v nej stratí, prestane žiť. Musí sa naučiť dôverovať svojmu srdcu.',
+                        8: 'Ona musí sa naučiť, že jej hodnota nie je v tom, čo dokáže. Jej úspechy sú impozantné – ale ak na nich stavia celú svoju identitu, zrúti sa. Musí sa naučiť, že je cenná aj bez výkonov.',
+                        9: 'Ona musí sa naučiť, že nie je povinná zachraňovať každého. Jej empatia je jej darom – ale ak sa nevie oddeliť, vyhorí. Musí sa naučiť, že aj ona má právo na svoj pokoj.'
+                    }
+                };
+
+                const genderMap = gender === 'm' ? base.m : base.f;
+                const text = genderMap[dest] || genderMap[1];
+
+                // Doplnenie podľa výzvy
+                const challengeMap = {
+                    1: ' Jeho/jej výzva je naučiť sa, že spolupracovať neznamená stratiť svoju silu.',
+                    2: ' Jeho/jej výzva je naučiť sa, že byť zraniteľný/á je odvaha, nie slabosť.',
+                    3: ' Jeho/jej výzva je naučiť sa, že radosť nie je únik, ale prítomnosť.',
+                    4: ' Jeho/jej výzva je naučiť sa, že odpočinok je produktívny.',
+                    5: ' Jeho/jej výzva je naučiť sa, že sloboda je v prijatí, nie v úteku.',
+                    6: ' Jeho/jej výzva je naučiť sa, že láska začína pri sebe.',
+                    7: ' Jeho/jej výzva je naučiť sa, že nie všetko sa dá pochopiť rozumom.',
+                    8: ' Jeho/jej výzva je naučiť sa, že moc je v službe, nie v ovládaní.',
+                    9: ' Jeho/jej výzva je naučiť sa, že aj on/ona potrebuje pomoc.'
+                };
+                const challText = challengeMap[challenge] || ' Jeho/jej výzva je nájsť rovnováhu medzi tým, čo chce, a tým, čo potrebuje.';
+                return text + ' ' + challText;
+            }
+
+            // ---- SPOLOČNÝ POTENCIÁL ----
+            function generatePotential(lpA, lpB, destA, destB, maturityA, maturityB) {
+                const sumLP = numerologySum(String(lpA + lpB));
+                const sumDest = numerologySum(String(destA + destB));
+                const sumMat = numerologySum(String(maturityA + maturityB));
+
+                let text = '';
+                if (sumLP === 1 || sumLP === 8) {
+                    text += 'Spolu máte potenciál dosiahnuť veľké veci. Ste silný tím, ktorý dokáže presadiť zmeny – vo svojom živote, v komunite, možno aj vo svete. '
+                } else if (sumLP === 2 || sumLP === 6) {
+                    text += 'Spolu máte potenciál vytvoriť hlboký, láskyplný vzťah, ktorý bude príkladom pre ostatných. Vaša sila je v spolupráci a vzájomnej podpore. '
+                } else if (sumLP === 3 || sumLP === 5) {
+                    text += 'Spolu máte potenciál žiť život plný radosti, dobrodružstva a tvorivosti. Vaša spoločná cesta bude inšpiratívna – pre vás aj pre tých, ktorí vás sledujú. '
+                } else if (sumLP === 4 || sumLP === 7) {
+                    text += 'Spolu máte potenciál vybudovať niečo trvalé – či už je to domov, rodina, alebo spoločné dielo. Vaša vytrvalosť a hĺbka sú vašou výhodou. '
+                } else {
+                    text += 'Spolu máte potenciál vytvoriť niečo, čo presahuje vás samotných. Vaša kombinácia je jedinečná – a ak sa naučíte spolupracovať, môžete dosiahnuť veci, o ktorých sa vám ani nesnívalo. '
+                }
+
+                // Zrelosť – čo sa naučia spolu
+                if (sumMat === 1 || sumMat === 8) {
+                    text += 'Spoločne sa naučíte, že skutočná sila nie je v ovládaní, ale v dôvere. '
+                } else if (sumMat === 2 || sumMat === 6) {
+                    text += 'Spoločne sa naučíte, že láska nie je len cítenie, ale aj vedomá voľba. '
+                } else if (sumMat === 3 || sumMat === 5) {
+                    text += 'Spoločne sa naučíte, že radosť je v prítomnosti, nie v hľadaní. '
+                } else if (sumMat === 4 || sumMat === 7) {
+                    text += 'Spoločne sa naučíte, že stabilita nie je väzenie, ale základ pre rast. '
+                } else {
+                    text += 'Spoločne sa naučíte, že vzťah je cesta, nie cieľ – a že táto cesta je to, čo dáva životu zmysel. '
+                }
+
+                return text;
+            }
+
+            // ================================================================
+            // 4. APP – RIADIACA LOGIKA
+            // ================================================================
+            const app = {
+                init() {
+                    this.cacheDom();
+                    this.bindEvents();
+                    this.populateDates();
+                    this.updateLanguage('sk');
+                },
+
+                cacheDom() {
+                    this.dom = {
+                        langButtons: document.querySelectorAll('.lang-selector button'),
+                        fullNameA: document.getElementById('fullNameA'),
+                        fullNameB: document.getElementById('fullNameB'),
+                        birthDayA: document.getElementById('birthDayA'),
+                        birthMonthA: document.getElementById('birthMonthA'),
+                        birthYearA: document.getElementById('birthYearA'),
+                        birthDayB: document.getElementById('birthDayB'),
+                        birthMonthB: document.getElementById('birthMonthB'),
+                        birthYearB: document.getElementById('birthYearB'),
+                        genderButtonsA: document.querySelectorAll('.gender-toggle[data-person="A"] button'),
+                        genderButtonsB: document.querySelectorAll('.gender-toggle[data-person="B"] button'),
+                        btnStart: document.getElementById('btnStart'),
+                        btnRestart: document.getElementById('btnRestart'),
+                        formSection: document.getElementById('formSection'),
+                        resultsContainer: document.getElementById('resultsContainer'),
+                        outputWrapper: document.getElementById('outputWrapper'),
+                        appTitle: document.getElementById('appTitle'),
+                        subBrand: document.getElementById('subBrand'),
+                        infoTitle: document.getElementById('infoTitle'),
+                        infoText: document.getElementById('infoText'),
+                    };
+                    this.lang = 'sk';
+                    this.genderA = 'm';
+                    this.genderB = 'm';
+                },
+
+                bindEvents() {
+                    this.dom.langButtons.forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            this.updateLanguage(btn.dataset.lang);
+                        });
+                    });
+
+                    this.dom.genderButtonsA.forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            this.dom.genderButtonsA.forEach(b => b.classList.remove('active'));
+                            btn.classList.add('active');
+                            this.genderA = btn.dataset.gender;
+                        });
+                    });
+
+                    this.dom.genderButtonsB.forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            this.dom.genderButtonsB.forEach(b => b.classList.remove('active'));
+                            btn.classList.add('active');
+                            this.genderB = btn.dataset.gender;
+                        });
+                    });
+
+                    this.dom.btnStart.addEventListener('click', () => this.startAnalysis());
+                    this.dom.btnRestart.addEventListener('click', () => this.restart());
+
+                    this.dom.fullNameA.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') this.startAnalysis();
+                    });
+                    this.dom.fullNameB.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') this.startAnalysis();
+                    });
+                },
+
+                populateDates() {
+                    const populate = (daySel, yearSel) => {
+                        if (daySel.options.length <= 1) {
+                            for (let i = 1; i <= 31; i++) {
+                                const opt = document.createElement('option');
+                                opt.value = i;
+                                opt.textContent = i;
+                                daySel.appendChild(opt);
+                            }
+                        }
+                        if (yearSel.options.length <= 1) {
+                            const curYear = new Date().getFullYear();
+                            for (let y = curYear; y >= 1920; y--) {
+                                const opt = document.createElement('option');
+                                opt.value = y;
+                                opt.textContent = y;
+                                yearSel.appendChild(opt);
+                            }
+                        }
+                    };
+                    populate(this.dom.birthDayA, this.dom.birthYearA);
+                    populate(this.dom.birthDayB, this.dom.birthYearB);
+                },
+
+                updateLanguage(lang) {
+                    this.lang = lang;
+                    const t = LANG[lang];
+                    if (!t) return;
+
+                    this.dom.langButtons.forEach(btn => {
+                        btn.classList.toggle('active', btn.dataset.lang === lang);
+                    });
+
+                    this.dom.appTitle.textContent = t.title;
+                    this.dom.subBrand.textContent = t.brand;
+                    this.dom.infoTitle.textContent = t.infoTitle;
+                    this.dom.infoText.textContent = t.infoText;
+                    document.getElementById('lblPersonA').textContent = t.personA;
+                    document.getElementById('lblPersonB').textContent = t.personB;
+                    document.getElementById('lblNameA').textContent = t.nameA;
+                    document.getElementById('lblNameB').textContent = t.nameB;
+                    document.getElementById('lblBirthA').textContent = t.birthA;
+                    document.getElementById('lblBirthB').textContent = t.birthB;
+                    document.getElementById('lblGenderA').textContent = t.genderA;
+                    document.getElementById('lblGenderB').textContent = t.genderB;
+                    this.dom.fullNameA.placeholder = t.namePlaceholderA;
+                    this.dom.fullNameB.placeholder = t.namePlaceholderB;
+                    document.getElementById('optDay').textContent = t.optDay;
+                    document.getElementById('optMonth').textContent = t.optMonth;
+                    document.getElementById('optYear').textContent = t.optYear;
+                    this.dom.genderButtonsA.forEach(btn => {
+                        if (btn.dataset.gender === 'm') btn.textContent = t.male;
+                        else btn.textContent = t.female;
+                    });
+                    this.dom.genderButtonsB.forEach(btn => {
+                        if (btn.dataset.gender === 'm') btn.textContent = t.male;
+                        else btn.textContent = t.female;
+                    });
+                    this.dom.btnStart.textContent = t.start;
+                    this.dom.btnRestart.textContent = t.restart;
+                },
+
+                startAnalysis() {
+                    const nameA = this.dom.fullNameA.value.trim();
+                    const nameB = this.dom.fullNameB.value.trim();
+                    const dayA = parseInt(this.dom.birthDayA.value);
+                    const monthA = parseInt(this.dom.birthMonthA.value);
+                    const yearA = parseInt(this.dom.birthYearA.value);
+                    const dayB = parseInt(this.dom.birthDayB.value);
+                    const monthB = parseInt(this.dom.birthMonthB.value);
+                    const yearB = parseInt(this.dom.birthYearB.value);
+
+                    if (!nameA || !nameB || !dayA || !monthA || !yearA || !dayB || !monthB || !yearB) {
+                        alert(LANG[this.lang].alert);
+                        return;
+                    }
+
+                    // === VÝPOČTY PRE OSOBU A ===
+                    const birthStrA = `${yearA}${String(monthA).padStart(2, '0')}${String(dayA).padStart(2, '0')}`;
+                    const designStrA = getAdjustedDate(yearA, monthA, dayA, -88);
+
+                    const lifePathA = numerologySum(birthStrA);
+                    const designA = numerologySum(designStrA);
+                    const destinyA = nameToNumber(nameA);
+                    const soulA = getVowelsSum(nameA);
+                    const persA = getConsonantsSum(nameA);
+                    const birthdayA = getBirthdayNumber(dayA);
+                    const challengeA = getChallenge(dayA, monthA);
+                    const maturityA = getMaturity(lifePathA, destinyA);
+                    const karmicA = getKarmicDebt(numerologySum(birthStrA));
+                    const subconsciousA = getSubconsciousSelf(nameA);
+                    const passionsA = getHiddenPassions(nameA);
+
+                    // === VÝPOČTY PRE OSOBU B ===
+                    const birthStrB = `${yearB}${String(monthB).padStart(2, '0')}${String(dayB).padStart(2, '0')}`;
+                    const designStrB = getAdjustedDate(yearB, monthB, dayB, -88);
+
+                    const lifePathB = numerologySum(birthStrB);
+                    const designB = numerologySum(designStrB);
+                    const destinyB = nameToNumber(nameB);
+                    const soulB = getVowelsSum(nameB);
+                    const persB = getConsonantsSum(nameB);
+                    const birthdayB = getBirthdayNumber(dayB);
+                    const challengeB = getChallenge(dayB, monthB);
+                    const maturityB = getMaturity(lifePathB, destinyB);
+                    const karmicB = getKarmicDebt(numerologySum(birthStrB));
+                    const subconsciousB = getSubconsciousSelf(nameB);
+                    const passionsB = getHiddenPassions(nameB);
+
+                    // === VZŤAHOVÉ ČÍSLA ===
+                    const relSumLP = numerologySum(String(lifePathA + lifePathB));
+                    const relDiffLP = Math.abs(lifePathA - lifePathB);
+                    const relSumDest = numerologySum(String(destinyA + destinyB));
+                    const relSumSoul = numerologySum(String(soulA + soulB));
+                    const relSumPers = numerologySum(String(persA + persB));
+                    const relSumMat = numerologySum(String(maturityA + maturityB));
+
+                    // === GENEROVANIE TEXTOV ===
+                    const t = LANG[this.lang];
+                    const parts = t.parts;
+                    const tags = t.tags;
+
+                    const attractionText = generateAttraction(lifePathA, lifePathB, soulA, soulB, persA, persB);
+                    const bondText = generateBond(lifePathA, lifePathB, destinyA, destinyB, soulA, soulB);
+                    const conflictText = generateConflict(lifePathA, lifePathB, destinyA, destinyB, challengeA, challengeB);
+                    const karmaText = generateKarma(lifePathA, lifePathB, destinyA, destinyB, soulA, soulB, karmicA, karmicB);
+                    const hisWorkText = generateWork(this.genderA, lifePathA, destinyA, soulA, persA, challengeA);
+                    const herWorkText = generateWork(this.genderB, lifePathB, destinyB, soulB, persB, challengeB);
+                    const potentialText = generatePotential(lifePathA, lifePathB, destinyA, destinyB, maturityA, maturityB);
+
+                    // === ZOBRAZENIE ===
+                    const html = `
+                        <div class="result-block">
+                            <div class="title">${parts.attraction} <span class="tag">${tags.attraction}</span></div>
+                            <p>${attractionText}</p>
+                        </div>
+                        <div class="result-block">
+                            <div class="title">${parts.bond} <span class="tag">${tags.bond}</span></div>
+                            <p>${bondText}</p>
+                        </div>
+                        <div class="result-block">
+                            <div class="title">${parts.conflict} <span class="tag">${tags.conflict}</span></div>
+                            <p>${conflictText}</p>
+                        </div>
+                        <div class="result-block">
+                            <div class="title">${parts.karma} <span class="tag">${tags.karma}</span></div>
+                            <p>${karmaText}</p>
+                        </div>
+                        <div class="result-block">
+                            <div class="title">${parts.hisWork} <span class="tag">${tags.hisWork}</span></div>
+                            <p>${hisWorkText}</p>
+                        </div>
+                        <div class="result-block">
+                            <div class="title">${parts.herWork} <span class="tag">${tags.herWork}</span></div>
+                            <p>${herWorkText}</p>
+                        </div>
+                        <div class="result-block">
+                            <div class="title">${parts.potential} <span class="tag">${tags.potential}</span></div>
+                            <p>${potentialText}</p>
+                        </div>
+                    `;
+
+                    this.dom.outputWrapper.innerHTML = html;
+                    this.dom.formSection.style.display = 'none';
+                    this.dom.resultsContainer.classList.add('active');
+                    this.dom.resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                },
+
+                restart() {
+                    this.dom.resultsContainer.classList.remove('active');
+                    this.dom.formSection.style.display = 'block';
+                    this.dom.outputWrapper.innerHTML = '';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            };
+
+            document.addEventListener('DOMContentLoaded', () => app.init());
+            window.app = app;
+        })();
+    </script>
+</body>
+</html>

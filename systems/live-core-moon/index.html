@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Human Maintenance — Live Core & Moon Matrix</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #060810;
+            --card: #0d1428;
+            --border: #1a2a3a;
+            --text: #e8edf5;
+            --muted: #6a8a9a;
+            --accent: #10b981;
+            --glow: rgba(16, 185, 129, 0.2);
+            --radius: 18px;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body.female {
+            --accent: #f472b6;
+            --glow: rgba(244, 114, 182, 0.2);
+            --border: #3a1a3a;
+            --muted: #9a7a8a;
+        }
+
+        .app {
+            max-width: 720px;
+            width: 100%;
+            background: var(--card);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 28px 24px 20px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .logo h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #5dbf8a, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo span {
+            display: block;
+            font-size: 0.6rem;
+            font-weight: 400;
+            color: var(--muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            -webkit-text-fill-color: var(--muted);
+        }
+
+        .lang-selector {
+            display: flex;
+            gap: 3px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 30px;
+            padding: 3px;
+            border: 1px solid var(--border);
+        }
+
+        .lang-selector button {
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.25s;
+            text-transform: uppercase;
+        }
+
+        .lang-selector button.active {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 0 20px var(--glow);
+        }
+
+        .live-status-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .status-pill {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 8px;
+            text-align: center;
+            font-size: 0.7rem;
+            color: var(--muted);
+        }
+
+        .status-pill span {
+            display: block;
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin-top: 2px;
+            letter-spacing: 0.5px;
+        }
+
+        .moon-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .moon-icon {
+            font-size: 1.1rem;
+        }
+
+        .form-section {
+            margin-bottom: 6px;
+        }
+
+        .form-section.hidden {
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--muted);
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 13px 16px;
+            background: #080c1a;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 1rem;
+            transition: 0.3s;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--glow);
+        }
+
+        .form-group input::placeholder {
+            color: var(--muted);
+            opacity: 0.4;
+        }
+
+        .date-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1.4fr;
+            gap: 10px;
+        }
+
+        .date-row select {
+            padding: 13px 10px;
+            background: #080c1a;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        .date-row select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--glow);
+        }
+
+        .gender-toggle {
+            display: flex;
+            gap: 10px;
+            background: #080c1a;
+            border-radius: 12px;
+            padding: 4px;
+            border: 1px solid var(--border);
+        }
+
+        .gender-toggle button {
+            flex: 1;
+            padding: 10px 0;
+            border: none;
+            background: transparent;
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        .gender-toggle button.active {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 0 20px var(--glow);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: var(--accent);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            margin-top: 6px;
+            box-shadow: 0 0 30px var(--glow);
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.01);
+            box-shadow: 0 0 50px var(--glow);
+        }
+
+        .results-container {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .results-container.active {
+            display: block;
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-block {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px 18px;
+            margin-bottom: 14px;
+            transition: border-color 0.3s;
+            border-left: 3px solid var(--accent);
+        }
+
+        .result-block .title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-block .title .tag {
+            font-size: 0.5rem;
+            color: var(--muted);
+            background: rgba(255, 255, 255, 0.04);
+            padding: 2px 10px;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+            font-weight: 400;
+        }
+
+        .result-block p {
+            font-size: 0.92rem;
+            line-height: 1.7;
+            color: #d0d8e8;
+            margin-top: 2px;
+        }
+
+        .result-block .highlight {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .btn-restart {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--muted);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.3s;
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .btn-restart:hover {
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        .footer {
+            margin-top: 28px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            font-size: 0.6rem;
+            color: var(--muted);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .footer strong {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        @media (max-width: 480px) {
+            .app {
+                padding: 16px 12px 14px;
+            }
+
+            .logo h1 {
+                font-size: 1.2rem;
+            }
+
+            .result-block {
+                padding: 14px 12px;
+            }
+
+            .result-block p {
+                font-size: 0.85rem;
+            }
+
+            .date-row {
+                grid-template-columns: 1fr 1fr 1.2fr;
+                gap: 6px;
+            }
+
+            .date-row select {
+                padding: 11px 6px;
+                font-size: 0.9rem;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .lang-selector {
+                align-self: flex-start;
+            }
+
+            .live-status-bar {
+                grid-template-columns: 1fr 1fr;
+                gap: 6px;
+            }
+
+            .live-status-bar .status-pill:last-child {
+                grid-column: span 2;
+            }
+        }
+    </style>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/variables.css">
+    <link rel="stylesheet" href="../../css/base.css">
+    <link rel="icon" href="../../images/logo-projektu.png">
+</head>
+<body class="hm-grid-bg">
+<div class="hm-topbar">
+    <a class="hm-back" href="../../index.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        Späť do centra
+    </a>
+    <span class="hm-system-tag">Live Core & Moon Matrix</span>
+</div>
+
+    <div class="app" id="app">
+        <div class="header">
+            <div class="logo">
+                <h1 id="appTitle">Live Core & Moon Matrix</h1>
+                <span id="subBrand">The Human Maintenance</span>
+            </div>
+            <div class="lang-selector" id="langSelector">
+                <button class="active" data-lang="sk">SK</button>
+                <button data-lang="en">EN</button>
+                <button data-lang="de">DE</button>
+                <button data-lang="cz">CZ</button>
+            </div>
+        </div>
+
+        <div class="live-status-bar" id="statusBar">
+            <div class="status-pill"><span id="lblDateTitle">Dnešný dátum</span> <span id="lblLiveDate">-</span></div>
+            <div class="status-pill"><span id="lblMoonTitle">Fáza Mesiaca</span>
+                <span class="moon-display"><span class="moon-icon" id="moonIcon">🌑</span><span id="lblMoonPhase">-</span></span>
+            </div>
+            <div class="status-pill"><span id="lblSeasonTitle">Sezónny cyklus</span> <span id="lblSeason">-</span></div>
+        </div>
+
+        <div class="form-section" id="formSection">
+            <div class="form-group">
+                <label id="lblName">Celé meno a priezvisko</label>
+                <input type="text" id="fullName" placeholder="napr. Július Kováč">
+            </div>
+            <div class="form-group">
+                <label id="lblBirth">Dátum narodenia</label>
+                <div class="date-row">
+                    <select id="birthDay"><option value="">Deň</option></select>
+                    <select id="birthMonth">
+                        <option value="">Mesiac</option>
+                        <option value="1">Január</option><option value="2">Február</option>
+                        <option value="3">Marec</option><option value="4">Apríl</option>
+                        <option value="5">Máj</option><option value="6">Jún</option>
+                        <option value="7">Júl</option><option value="8">August</option>
+                        <option value="9">September</option><option value="10">Október</option>
+                        <option value="11">November</option><option value="12">December</option>
+                    </select>
+                    <select id="birthYear"><option value="">Rok</option></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label id="lblGender">Polarita</label>
+                <div class="gender-toggle" id="genderToggle">
+                    <button class="active" data-gender="m">⚡ Muž</button>
+                    <button data-gender="f">🌸 Žena</button>
+                </div>
+            </div>
+            <button class="btn-primary" id="btnStart">✦ Spustiť živú diagnostiku</button>
+        </div>
+
+        <div class="results-container" id="resultsContainer">
+            <div id="outputWrapper"></div>
+            <button class="btn-restart" id="btnRestart">↺ Začať odznova</button>
+        </div>
+
+        <div class="footer">
+            <strong>Grizzly Courage</strong> · The Human Maintenance
+            <div id="systemUsageCounter" style="margin-top:10px; font-size:11px; letter-spacing:.12em; text-transform:uppercase; opacity:.8;">Počet použití: 0x</div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ================================================================
+            // 1. JAZYKOVÉ PREKLADY
+            // ================================================================
+            const LANG = {
+                sk: {
+                    title: 'Live Core & Moon Matrix',
+                    brand: 'The Human Maintenance',
+                    name: 'Celé meno a priezvisko',
+                    namePlaceholder: 'napr. Július Kováč',
+                    birth: 'Dátum narodenia',
+                    gender: 'Polarita',
+                    male: '⚡ Muž',
+                    female: '🌸 Žena',
+                    start: '✦ Spustiť živú diagnostiku',
+                    restart: '↺ Začať odznova',
+                    alert: 'Prosím, vyplňte meno a dátum narodenia.',
+                    dateTitle: 'Dnešný dátum',
+                    moonTitle: 'Fáza Mesiaca',
+                    seasonTitle: 'Sezónny cyklus',
+                    parts: {
+                        core: '⚡ Tvoj základ',
+                        soul: '🌙 Tvoja duša a maska',
+                        challenge: '🔥 Tvoja výzva a zrelosť',
+                        year: '📅 Tento rok',
+                        month: '📆 Tento mesiac',
+                        today: '🌅 Dnes',
+                        moon: '🌕 Lunárny kontext',
+                        astrology: '✨ Astrologický kontext',
+                        synthesis: '🌀 Syntéza'
+                    },
+                    tags: {
+                        core: 'kto si',
+                        soul: 'vnútro a vonkajšok',
+                        challenge: 'lekcia',
+                        year: 'téma roka',
+                        month: 'téma mesiaca',
+                        today: 'téma dňa',
+                        moon: 'mesiac',
+                        astrology: 'znamenie',
+                        synthesis: 'celok'
+                    }
+                },
+                en: {
+                    title: 'Live Core & Moon Matrix',
+                    brand: 'The Human Maintenance',
+                    name: 'Full Name',
+                    namePlaceholder: 'e.g. John Doe',
+                    birth: 'Date of Birth',
+                    gender: 'Polarity',
+                    male: '⚡ Male',
+                    female: '🌸 Female',
+                    start: '✦ Run Live Diagnostics',
+                    restart: '↺ Start Over',
+                    alert: 'Please fill in your name and date of birth.',
+                    dateTitle: 'Current Date',
+                    moonTitle: 'Moon Phase',
+                    seasonTitle: 'Seasonal Cycle',
+                    parts: {
+                        core: '⚡ Your Core',
+                        soul: '🌙 Your Soul & Mask',
+                        challenge: '🔥 Your Challenge & Maturity',
+                        year: '📅 This Year',
+                        month: '📆 This Month',
+                        today: '🌅 Today',
+                        moon: '🌕 Lunar Context',
+                        astrology: '✨ Astrological Context',
+                        synthesis: '🌀 Synthesis'
+                    },
+                    tags: {
+                        core: 'who you are',
+                        soul: 'inner & outer',
+                        challenge: 'lesson',
+                        year: 'year theme',
+                        month: 'month theme',
+                        today: 'day theme',
+                        moon: 'moon',
+                        astrology: 'sign',
+                        synthesis: 'whole'
+                    }
+                },
+                de: {
+                    title: 'Live Core & Moon Matrix',
+                    brand: 'The Human Maintenance',
+                    name: 'Vollständiger Name',
+                    namePlaceholder: 'z.B. Julius Kováč',
+                    birth: 'Geburtsdatum',
+                    gender: 'Polarität',
+                    male: '⚡ Männlich',
+                    female: '🌸 Weiblich',
+                    start: '✦ Live-Diagnostik starten',
+                    restart: '↺ Neu beginnen',
+                    alert: 'Bitte geben Sie Namen und Geburtsdatum ein.',
+                    dateTitle: 'Heutiges Datum',
+                    moonTitle: 'Mondphase',
+                    seasonTitle: 'Jahreszeit',
+                    parts: {
+                        core: '⚡ Dein Kern',
+                        soul: '🌙 Deine Seele & Maske',
+                        challenge: '🔥 Deine Herausforderung & Reife',
+                        year: '📅 Dieses Jahr',
+                        month: '📆 Dieser Monat',
+                        today: '🌅 Heute',
+                        moon: '🌕 Lunarer Kontext',
+                        astrology: '✨ Astrologischer Kontext',
+                        synthesis: '🌀 Synthese'
+                    },
+                    tags: {
+                        core: 'wer du bist',
+                        soul: 'innen & außen',
+                        challenge: 'Lektion',
+                        year: 'Jahresthema',
+                        month: 'Monatsthema',
+                        today: 'Tageschema',
+                        moon: 'Mond',
+                        astrology: 'Sternzeichen',
+                        synthesis: 'Ganzes'
+                    }
+                },
+                cz: {
+                    title: 'Live Core & Moon Matrix',
+                    brand: 'The Human Maintenance',
+                    name: 'Celé jméno a příjmení',
+                    namePlaceholder: 'např. Julius Kováč',
+                    birth: 'Datum narození',
+                    gender: 'Polarita',
+                    male: '⚡ Muž',
+                    female: '🌸 Žena',
+                    start: '✦ Spustit živou diagnostiku',
+                    restart: '↺ Začít znovu',
+                    alert: 'Prosím, vyplňte jméno a datum narození.',
+                    dateTitle: 'Dnešní datum',
+                    moonTitle: 'Fáze Měsíce',
+                    seasonTitle: 'Roční cyklus',
+                    parts: {
+                        core: '⚡ Tvůj základ',
+                        soul: '🌙 Tvá duše a maska',
+                        challenge: '🔥 Tvá výzva a zralost',
+                        year: '📅 Tento rok',
+                        month: '📆 Tento měsíc',
+                        today: '🌅 Dnes',
+                        moon: '🌕 Lunární kontext',
+                        astrology: '✨ Astrologický kontext',
+                        synthesis: '🌀 Syntéza'
+                    },
+                    tags: {
+                        core: 'kdo jsi',
+                        soul: 'vnitřek a vnějšek',
+                        challenge: 'lekce',
+                        year: 'téma roku',
+                        month: 'téma měsíce',
+                        today: 'téma dne',
+                        moon: 'měsíc',
+                        astrology: 'znamení',
+                        synthesis: 'celek'
+                    }
+                }
+            };
+
+            // ================================================================
+            // 2. NUMEROLOGICKÉ FUNKCIE (15+ výpočtov)
+            // ================================================================
+
+            function numerologySum(str) {
+                let sum = 0;
+                for (let ch of str) {
+                    let d = parseInt(ch);
+                    if (!isNaN(d)) sum += d;
+                }
+                while (sum > 9 && sum !== 11 && sum !== 22 && sum !== 33) {
+                    sum = String(sum).split('').reduce((a, b) => parseInt(a) + parseInt(b), 0);
+                }
+                return sum;
+            }
+
+            function nameToNumber(name) {
+                const map = {
+                    'a': 1, 'á': 1, 'ä': 1, 'b': 2, 'c': 3, 'č': 3, 'd': 4, 'ď': 4,
+                    'e': 5, 'é': 5, 'ě': 5, 'f': 6, 'g': 7, 'h': 8, 'ch': 8, 'i': 9,
+                    'í': 9, 'j': 1, 'k': 2, 'l': 3, 'm': 4, 'n': 5, 'ň': 5, 'o': 6,
+                    'ó': 6, 'ô': 6, 'p': 7, 'q': 8, 'r': 9, 'ř': 9, 's': 1, 'š': 1,
+                    't': 2, 'ť': 2, 'u': 3, 'ú': 3, 'ů': 3, 'v': 4, 'w': 5, 'x': 6,
+                    'y': 7, 'ý': 7, 'z': 8, 'ž': 8
+                };
+                let clean = name.toLowerCase().replace(/[^a-záäčďéěíňóôřšťúůýž]/g, '');
+                let sum = 0;
+                for (let ch of clean) {
+                    if (map[ch]) sum += map[ch];
+                }
+                while (sum > 9 && sum !== 11 && sum !== 22 && sum !== 33) {
+                    sum = String(sum).split('').reduce((a, b) => parseInt(a) + parseInt(b), 0);
+                }
+                return sum;
+            }
+
+            function getVowelsSum(name) {
+                const vowels = 'aeiouyáäéíóôúý';
+                let sum = 0;
+                let clean = name.toLowerCase().replace(/[^a-záäčďéěíňóôřšťúůýž]/g, '');
+                for (let ch of clean) {
+                    if (vowels.includes(ch)) {
+                        const map = {
+                            'a': 1, 'á': 1, 'ä': 1, 'e': 5, 'é': 5, 'ě': 5,
+                            'i': 9, 'í': 9, 'o': 6, 'ó': 6, 'ô': 6, 'u': 3,
+                            'ú': 3, 'ů': 3, 'y': 7, 'ý': 7
+                        };
+                        sum += map[ch] || 0;
+                    }
+                }
+                while (sum > 9 && sum !== 11 && sum !== 22 && sum !== 33) {
+                    sum = String(sum).split('').reduce((a, b) => parseInt(a) + parseInt(b), 0);
+                }
+                return sum;
+            }
+
+            function getConsonantsSum(name) {
+                const vowels = 'aeiouyáäéíóôúý';
+                let sum = 0;
+                let clean = name.toLowerCase().replace(/[^a-záäčďéěíňóôřšťúůýž]/g, '');
+                for (let ch of clean) {
+                    if (!vowels.includes(ch)) {
+                        const map = {
+                            'b': 2, 'c': 3, 'č': 3, 'd': 4, 'ď': 4, 'f': 6,
+                            'g': 7, 'h': 8, 'ch': 8, 'j': 1, 'k': 2, 'l': 3,
+                            'm': 4, 'n': 5, 'ň': 5, 'p': 7, 'q': 8, 'r': 9,
+                            'ř': 9, 's': 1, 'š': 1, 't': 2, 'ť': 2, 'v': 4,
+                            'w': 5, 'x': 6, 'z': 8, 'ž': 8
+                        };
+                        sum += map[ch] || 0;
+                    }
+                }
+                while (sum > 9 && sum !== 11 && sum !== 22 && sum !== 33) {
+                    sum = String(sum).split('').reduce((a, b) => parseInt(a) + parseInt(b), 0);
+                }
+                return sum;
+            }
+
+            function getAdjustedDate(year, month, day, daysOffset) {
+                const d = new Date(year, month - 1, day);
+                d.setDate(d.getDate() + daysOffset);
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const dd = String(d.getDate()).padStart(2, '0');
+                return `${y}${m}${dd}`;
+            }
+
+            function getBirthdayNumber(day) {
+                return numerologySum(String(day));
+            }
+
+            function getChallenge(day, month) {
+                const diff = Math.abs(parseInt(day) - parseInt(month));
+                return numerologySum(String(diff));
+            }
+
+            function getMaturity(lifePath, destiny) {
+                return numerologySum(String(lifePath + destiny));
+            }
+
+            function getPersonalYear(day, month, year) {
+                const currentYear = new Date().getFullYear();
+                const sum = numerologySum(String(day) + String(month) + String(currentYear));
+                return sum;
+            }
+
+            function getPersonalMonth(personalYear) {
+                const currentMonth = new Date().getMonth() + 1;
+                const sum = numerologySum(String(personalYear) + String(currentMonth));
+                return sum;
+            }
+
+            function getPersonalDay(personalYear, personalMonth) {
+                const currentDay = new Date().getDate();
+                const sum = numerologySum(String(personalYear) + String(personalMonth) + String(currentDay));
+                return sum;
+            }
+
+            function getPersonalWeek(personalYear, personalMonth) {
+                const currentWeek = Math.ceil(new Date().getDate() / 7);
+                const sum = numerologySum(String(personalYear) + String(personalMonth) + String(currentWeek));
+                return sum;
+            }
+
+            function getUniversalYear() {
+                const year = new Date().getFullYear();
+                return numerologySum(String(year));
+            }
+
+            function getUniversalDay() {
+                const today = new Date();
+                const str = `${today.getFullYear()}${String(today.getMonth()+1).padStart(2,'0')}${String(today.getDate()).padStart(2,'0')}`;
+                return numerologySum(str);
+            }
+
+            function getLunarDay(date) {
+                // Jednoduchá aproximácia lunárneho dňa (1-30)
+                const start = new Date(2024, 0, 11); // známy nov
+                const diff = (date - start) / (1000 * 60 * 60 * 24);
+                const day = (diff % 29.53) + 1;
+                return Math.floor(day);
+            }
+
+            function getZodiacSign(month, day) {
+                const signs = [
+                    { name: 'Baran', start: [3, 21], end: [4, 19] },
+                    { name: 'Býk', start: [4, 20], end: [5, 20] },
+                    { name: 'Blíženci', start: [5, 21], end: [6, 20] },
+                    { name: 'Rak', start: [6, 21], end: [7, 22] },
+                    { name: 'Lev', start: [7, 23], end: [8, 22] },
+                    { name: 'Panna', start: [8, 23], end: [9, 22] },
+                    { name: 'Váhy', start: [9, 23], end: [10, 22] },
+                    { name: 'Škorpión', start: [10, 23], end: [11, 21] },
+                    { name: 'Strelec', start: [11, 22], end: [12, 21] },
+                    { name: 'Kozorožec', start: [12, 22], end: [1, 19] },
+                    { name: 'Vodnár', start: [1, 20], end: [2, 18] },
+                    { name: 'Ryby', start: [2, 19], end: [3, 20] }
+                ];
+                for (let sign of signs) {
+                    let [sm, sd] = sign.start;
+                    let [em, ed] = sign.end;
+                    if (month === sm && day >= sd) return sign.name;
+                    if (month === em && day <= ed) return sign.name;
+                    if (month > sm && month < em) return sign.name;
+                    if (sm === 12 && month === 1 && day <= ed) return sign.name;
+                }
+                return 'Kozorožec';
+            }
+
+            // ================================================================
+            // 3. GENERÁTORY TEXTU (9 častí)
+            // ================================================================
+
+            function generateCore(lifePath, design, birthday) {
+                const lifeMap = {
+                    1: 'Si rodený vodca. Tvoja cesta je o nezávislosti a originalite.',
+                    2: 'Si citlivý a vnímavý. Tvoja cesta je o spolupráci a harmónii.',
+                    3: 'Si rodený komunikátor. Tvoja cesta je o kreativite a radosti.',
+                    4: 'Si staviteľ. Tvoja cesta je o stabilite, tvrdej práci a vytrvalosti.',
+                    5: 'Si dobrodruh. Tvoja cesta je o slobode, zmene a objavovaní.',
+                    6: 'Si ochranca. Tvoja cesta je o láske, starostlivosti a zodpovednosti.',
+                    7: 'Si hľadač. Tvoja cesta je o múdrosti, poznaní a duchovnosti.',
+                    8: 'Si tvorca. Tvoja cesta je o moci, úspechu a materiálnom naplnení.',
+                    9: 'Si humanista. Tvoja cesta je o službe, empatii a zavŕšení.'
+                };
+                const designMap = {
+                    1: ' Tvoje podvedomie túži po nezávislosti a originalite.',
+                    2: ' Tvoje podvedomie túži po harmónii a porozumení.',
+                    3: ' Tvoje podvedomie túži po kreativite a sebavyjadrení.',
+                    4: ' Tvoje podvedomie túži po stabilite a poriadku.',
+                    5: ' Tvoje podvedomie túži po slobode a dobrodružstve.',
+                    6: ' Tvoje podvedomie túži po láske a starostlivosti.',
+                    7: ' Tvoje podvedomie túži po múdrosti a poznaní.',
+                    8: ' Tvoje podvedomie túži po moci a naplnení.',
+                    9: ' Tvoje podvedomie túži po službe a zmysle.'
+                };
+                const birthdayMap = {
+                    1: ' Tvoj špeciálny dar je originalita a schopnosť ísť vlastnou cestou.',
+                    2: ' Tvoj špeciálny dar je citlivosť a schopnosť vytvárať harmóniu.',
+                    3: ' Tvoj špeciálny dar je kreativita a dar slova.',
+                    4: ' Tvoj špeciálny dar je vytrvalosť a praktickosť.',
+                    5: ' Tvoj špeciálny dar je prispôsobivosť a dobrodružnosť.',
+                    6: ' Tvoj špeciálny dar je starostlivosť a zodpovednosť.',
+                    7: ' Tvoj špeciálny dar je analytickosť a hĺbka myslenia.',
+                    8: ' Tvoj špeciálny dar je organizácia a schopnosť dosahovať ciele.',
+                    9: ' Tvoj špeciálny dar je empatia a schopnosť inšpirovať.'
+                };
+                const l = lifeMap[lifePath] || lifeMap[1];
+                const d = designMap[design] || designMap[1];
+                const b = birthdayMap[birthday] || birthdayMap[1];
+                return l + ' ' + d + ' ' + b;
+            }
+
+            function generateSoul(soulUrge, personality, destiny) {
+                const soulMap = {
+                    1: 'Tvoja duša túži po nezávislosti a sebarealizácii.',
+                    2: 'Tvoja duša túži po harmónii a hlbokých vzťahoch.',
+                    3: 'Tvoja duša túži po kreativite a radosti.',
+                    4: 'Tvoja duša túži po stabilite a bezpečí.',
+                    5: 'Tvoja duša túži po slobode a pestrosti.',
+                    6: 'Tvoja duša túži po láske a starostlivosti.',
+                    7: 'Tvoja duša túži po poznaní a múdrosti.',
+                    8: 'Tvoja duša túži po moci a naplnení.',
+                    9: 'Tvoja duša túži po službe a zmysluplnosti.'
+                };
+                const personMap = {
+                    1: ' Navonok pôsobíš ako nezávislý a silný človek.',
+                    2: ' Navonok pôsobíš ako jemný a citlivý človek.',
+                    3: ' Navonok pôsobíš ako kreatívny a komunikatívny človek.',
+                    4: ' Navonok pôsobíš ako spoľahlivý a praktický človek.',
+                    5: ' Navonok pôsobíš ako slobodomyseľný a dobrodružný človek.',
+                    6: ' Navonok pôsobíš ako starostlivý a zodpovedný človek.',
+                    7: ' Navonok pôsobíš ako premýšľavý a hlboký človek.',
+                    8: ' Navonok pôsobíš ako úspešný a sebavedomý človek.',
+                    9: ' Navonok pôsobíš ako empatický a inšpiratívny človek.'
+                };
+                const destMap = {
+                    1: ' Tvoj životný cieľ je naučiť sa byť sám sebou – a byť za to vďačný.',
+                    2: ' Tvoj životný cieľ je naučiť sa budovať vzťahy – a byť v nich autentický.',
+                    3: ' Tvoj životný cieľ je naučiť sa vyjadrovať svoju pravdu – a prinášať radosť.',
+                    4: ' Tvoj životný cieľ je naučiť sa budovať pevné základy – a byť oporou.',
+                    5: ' Tvoj životný cieľ je naučiť sa žiť slobodne – a prijímať zodpovednosť.',
+                    6: ' Tvoj životný cieľ je naučiť sa milovať – a byť milovaný.',
+                    7: ' Tvoj životný cieľ je naučiť sa hľadať pravdu – a zdieľať ju.',
+                    8: ' Tvoj životný cieľ je naučiť sa používať svoju moc – a slúžiť ňou.',
+                    9: ' Tvoj životný cieľ je naučiť sa slúžiť ľudstvu – a nezabúdať na seba.'
+                };
+                const s = soulMap[soulUrge] || soulMap[1];
+                const p = personMap[personality] || personMap[1];
+                const d = destMap[destiny] || destMap[1];
+                return s + ' ' + p + ' ' + d;
+            }
+
+            function generateChallenge(challenge, maturity) {
+                const challengeMap = {
+                    1: 'Tvoja výzva je naučiť sa prijímať pomoc a spolupracovať.',
+                    2: 'Tvoja výzva je naučiť sa byť asertívny a hovoriť o svojich potrebách.',
+                    3: 'Tvoja výzva je naučiť sa sústrediť a dotiahnuť veci do konca.',
+                    4: 'Tvoja výzva je naučiť sa uvoľniť kontrolu a prijať zmenu.',
+                    5: 'Tvoja výzva je naučiť sa zostať a budovať, nie stále unikať.',
+                    6: 'Tvoja výzva je naučiť sa prijímať lásku a starostlivosť od druhých.',
+                    7: 'Tvoja výzva je naučiť sa dôverovať svojmu srdcu, nielen rozumu.',
+                    8: 'Tvoja výzva je naučiť sa, že tvoja hodnota nie je v tom, čo vlastníš.',
+                    9: 'Tvoja výzva je naučiť sa, že nie všetko sa dá zachrániť – a to je v poriadku.'
+                };
+                const maturityMap = {
+                    1: ' V zrelosti sa z teba stane múdry vodca, ktorý inšpiruje bez toho, aby ovládal.',
+                    2: ' V zrelosti sa z teba stane harmonický sprievodca, ktorý spája ľudí.',
+                    3: ' V zrelosti sa z teba stane tvorca, ktorý prináša radosť a inšpiráciu.',
+                    4: ' V zrelosti sa z teba stane staviteľ, na ktorého sa môžu všetci spoľahnúť.',
+                    5: ' V zrelosti sa z teba stane slobodný duch, ktorý objavuje a inšpiruje.',
+                    6: ' V zrelosti sa z teba stane ochranca, ktorý miluje a stará sa.',
+                    7: ' V zrelosti sa z teba stane mudrc, ktorý hľadá a zdieľa pravdu.',
+                    8: ' V zrelosti sa z teba stane líder, ktorý používa svoju moc na dobro.',
+                    9: ' V zrelosti sa z teba stane humanista, ktorý slúži ľudstvu s pokorou.'
+                };
+                const c = challengeMap[challenge] || challengeMap[1];
+                const m = maturityMap[maturity] || maturityMap[1];
+                return c + ' ' + m;
+            }
+
+            function generateYear(personalYear, universalYear) {
+                const personalMap = {
+                    1: 'Tento rok je o nových začiatkoch. Máš pred sebou čistý štít – využi ho.',
+                    2: 'Tento rok je o spolupráci a trpezlivosti. Buduj vzťahy a dôveruj procesu.',
+                    3: 'Tento rok je o kreativite a radosti. Vyjadruj sa a oslavuj svoj pokrok.',
+                    4: 'Tento rok je o tvrdej práci a budovaní. Polož základy, ktoré vydržia.',
+                    5: 'Tento rok je o zmene a slobode. Otvor sa novým možnostiam a dobrodružstvám.',
+                    6: 'Tento rok je o láske a zodpovednosti. Staraj sa o druhých, ale nezabúdaj na seba.',
+                    7: 'Tento rok je o introspekcii a duchovnom raste. Spomaľ a počúvaj svoje vnútro.',
+                    8: 'Tento rok je o moci a úspechu. Zbieraj plody svojej práce a prevezmi vedenie.',
+                    9: 'Tento rok je o zavŕšení a odpúšťaní. Uzavri staré kapitoly a priprav sa na nové.'
+                };
+                const universalMap = {
+                    1: ' Kolektívna energia tohto roka je o nových začiatkoch – svet sa mení.',
+                    2: ' Kolektívna energia tohto roka je o spolupráci – ľudia sa spájajú.',
+                    3: ' Kolektívna energia tohto roka je o kreativite – rodia sa nové nápady.',
+                    4: ' Kolektívna energia tohto roka je o budovaní – tvoria sa nové štruktúry.',
+                    5: ' Kolektívna energia tohto roka je o zmene – staré sa búra, nové vzniká.',
+                    6: ' Kolektívna energia tohto roka je o zodpovednosti – ľudia preberajú vedenie.',
+                    7: ' Kolektívna energia tohto roka je o reflexii – spoločnosť hľadá odpovede.',
+                    8: ' Kolektívna energia tohto roka je o moci – dôležité sú výsledky.',
+                    9: ' Kolektívna energia tohto roka je o zavŕšení – jedna éra sa končí.'
+                };
+                const p = personalMap[personalYear] || personalMap[1];
+                const u = universalMap[universalYear] || universalMap[1];
+                return p + ' ' + u;
+            }
+
+            function generateMonth(personalMonth) {
+                const map = {
+                    1: 'Tento mesiac sa zameraj na seba – svoje ciele, svoju odvahu, svoju cestu.',
+                    2: 'Tento mesiac sa zameraj na vzťahy – počúvaj, spolupracuj, buď trpezlivý.',
+                    3: 'Tento mesiac sa zameraj na radosť – tvori, zabávaj sa, vyjadruj sa.',
+                    4: 'Tento mesiac sa zameraj na prácu – sústreď sa, buď disciplinovaný, dotiahni veci.',
+                    5: 'Tento mesiac sa zameraj na zmenu – skús niečo nové, otvor sa dobrodružstvu.',
+                    6: 'Tento mesiac sa zameraj na lásku – staraj sa, buď oporou, prijímaj starostlivosť.',
+                    7: 'Tento mesiac sa zameraj na seba – spomaľ, premýšľaj, hľadaj odpovede.',
+                    8: 'Tento mesiac sa zameraj na výsledky – tvoja práca prináša ovocie, zbieraj ho.',
+                    9: 'Tento mesiac sa zameraj na odpustenie – nechaj minulosť minulosťou.'
+                };
+                return map[personalMonth] || map[1];
+            }
+
+            function generateToday(personalDay, universalDay, lunarDay) {
+                const personalMap = {
+                    1: 'Dnešný deň je o odvahe – sprav krok, ktorý si odkladal.',
+                    2: 'Dnešný deň je o spolupráci – spoj sa s niekým, kto ti môže pomôcť.',
+                    3: 'Dnešný deň je o radosti – nájdi si čas na to, čo ťa baví.',
+                    4: 'Dnešný deň je o práci – sústredenie a vytrvalosť prinesú ovocie.',
+                    5: 'Dnešný deň je o zmene – otvor sa niečomu novému.',
+                    6: 'Dnešný deň je o láske – venuj pozornosť niekomu, na kom ti záleží.',
+                    7: 'Dnešný deň je o tichu – nájdi chvíľu pre seba a svoje myšlienky.',
+                    8: 'Dnešný deň je o výsledkoch – tvoja práca sa vypláca, osláv to.',
+                    9: 'Dnešný deň je o odpúšťaní – nechaj ísť to, čo ťa už dlho ťaží.'
+                };
+                const universalMap = {
+                    1: ' Dnešná kolektívna energia je o odvahe a nových začiatkoch.',
+                    2: ' Dnešná kolektívna energia je o spolupráci a porozumení.',
+                    3: ' Dnešná kolektívna energia je o kreativite a radosti.',
+                    4: ' Dnešná kolektívna energia je o práci a disciplíne.',
+                    5: ' Dnešná kolektívna energia je o zmene a slobode.',
+                    6: ' Dnešná kolektívna energia je o láske a zodpovednosti.',
+                    7: ' Dnešná kolektívna energia je o reflexii a vnútornom raste.',
+                    8: ' Dnešná kolektívna energia je o moci a výsledkoch.',
+                    9: ' Dnešná kolektívna energia je o zavŕšení a odpúšťaní.'
+                };
+                const lunarMap = {
+                    1: ' Lunárny deň 1 – ideálny na nové začiatky a nastavenie zámerov.',
+                    2: ' Lunárny deň 2 – vhodný na spoluprácu a budovanie vzťahov.',
+                    3: ' Lunárny deň 3 – dobrý na komunikáciu a kreativitu.',
+                    4: ' Lunárny deň 4 – čas na prácu a organizáciu.',
+                    5: ' Lunárny deň 5 – deň zmien a dobrodružstva.',
+                    6: ' Lunárny deň 6 – deň starostlivosti a zodpovednosti.',
+                    7: ' Lunárny deň 7 – deň ticha a vnútornej práce.',
+                    8: ' Lunárny deň 8 – deň výsledkov a naplnenia.',
+                    9: ' Lunárny deň 9 – deň zavŕšenia a odpúšťania.',
+                    10: ' Lunárny deň 10 – deň objavov a nových ciest.',
+                    11: ' Lunárny deň 11 – deň intuície a duchovných vhľadov.',
+                    12: ' Lunárny deň 12 – deň komunikácie a zdieľania.',
+                    13: ' Lunárny deň 13 – deň transformácie a hlbokého uvoľnenia.',
+                    14: ' Lunárny deň 14 – deň kreativity a odvahy.',
+                    15: ' Lunárny deň 15 – deň zavŕšenia a vďačnosti.',
+                    16: ' Lunárny deň 16 – deň reflexie a sebapoznania.',
+                    17: ' Lunárny deň 17 – deň radosti a osláv.',
+                    18: ' Lunárny deň 18 – deň vnútornej práce a uzemnenia.',
+                    19: ' Lunárny deň 19 – deň odvahy a transformácie.',
+                    20: ' Lunárny deň 20 – deň vedenia a zodpovednosti.',
+                    21: ' Lunárny deň 21 – deň harmónie a spolupráce.',
+                    22: ' Lunárny deň 22 – deň múdrosti a hlbokého poznania.',
+                    23: ' Lunárny deň 23 – deň odvahy a výziev.',
+                    24: ' Lunárny deň 24 – deň tvorivosti a radosti.',
+                    25: ' Lunárny deň 25 – deň vnútornej sily a múdrosti.',
+                    26: ' Lunárny deň 26 – deň služby a starostlivosti.',
+                    27: ' Lunárny deň 27 – deň hlbokej intuície.',
+                    28: ' Lunárny deň 28 – deň zavŕšenia a odpúšťania.',
+                    29: ' Lunárny deň 29 – deň uvoľnenia a prípravy na nový cyklus.',
+                    30: ' Lunárny deň 30 – deň zavŕšenia a vnútornej práce.'
+                };
+                const p = personalMap[personalDay] || personalMap[1];
+                const u = universalMap[universalDay] || universalMap[1];
+                const l = lunarMap[lunarDay] || lunarMap[1];
+                return p + ' ' + u + ' ' + l;
+            }
+
+            function generateMoon(phaseName, phaseIcon, lunarDay) {
+                const phaseMap = {
+                    'Nov (Prázdno)': 'Nov je časom ticha a nových začiatkov. Polož zámer, ktorý chceš, aby rástol.',
+                    'Dorastajúci srp': 'Energia rastie. Každý krok ťa posúva vpred – aj ten malý.',
+                    'Prvá štvrť': 'Výzvy prichádzajú, ale aj rozhodnutia. Teraz sa ukáže, čo naozaj chceš.',
+                    'Dorastajúci mesiac': 'Tlak stúpa. Sústreď sa na to, čo naozaj chceš dokončiť.',
+                    'Spln (Max tlak)': 'Vrchol energie. To, čo si zasial, teraz žneš. Uvedom si, čo prinášaš do sveta.',
+                    'Cúvajúci mesiac': 'Energia sa uvoľňuje. Čas na zhodnotenie a pustenie toho, čo už neslúži.',
+                    'Posledná štvrť': 'Čas na upratanie. Ukonči to, čo už nemá zmysel.',
+                    'Ubúdajúci srp': 'Ticho pred novým cyklom. Oddýchni si a priprav sa na nový začiatok.'
+                };
+                const base = phaseMap[phaseName] || phaseMap['Nov (Prázdno)'];
+                const lunarText = ` Lunárny deň ${lunarDay} prináša špecifickú energiu – vnímaj ju, ale nechaj ju plynúť.`;
+                return `${base} ${lunarText}`;
+            }
+
+            function generateAstrology(sign) {
+                const map = {
+                    'Baran': 'Si ohnivý a priamy. Tvoja sila je v odvahe, tvoja výzva v trpezlivosti.',
+                    'Býk': 'Si stabilný a spoľahlivý. Tvoja sila je v vytrvalosti, tvoja výzva v prijímaní zmien.',
+                    'Blíženci': 'Si komunikatívny a zvedavý. Tvoja sila je v učení sa, tvoja výzva v sústredení.',
+                    'Rak': 'Si citlivý a starostlivý. Tvoja sila je v empatii, tvoja výzva v ochrane vlastných hraníc.',
+                    'Lev': 'Si charizmatický a tvorivý. Tvoja sila je v sebavedomí, tvoja výzva v pokore.',
+                    'Panna': 'Si analytický a praktický. Tvoja sila je v precíznosti, tvoja výzva v prijímaní nedokonalosti.',
+                    'Váhy': 'Si diplomatický a spravodlivý. Tvoja sila je v rovnováhe, tvoja výzva v rozhodovaní.',
+                    'Škorpión': 'Si hlboký a intenzívny. Tvoja sila je v transformácii, tvoja výzva v odpúšťaní.',
+                    'Strelec': 'Si optimistický a dobrodružný. Tvoja sila je v objavovaní, tvoja výzva v zodpovednosti.',
+                    'Kozorožec': 'Si disciplinovaný a cieľavedomý. Tvoja sila je v vytrvalosti, tvoja výzva v uvoľnení.',
+                    'Vodnár': 'Si originálny a vizionársky. Tvoja sila je v inovácii, tvoja výzva v prijímaní tradícií.',
+                    'Ryby': 'Si intuitívny a empatický. Tvoja sila je v predstavivosti, tvoja výzva v uzemnení.'
+                };
+                return map[sign] || map['Kozorožec'];
+            }
+
+            function generateSynthesis(allNumbers, gender) {
+                const { lifePath, design, destiny, soulUrge, personality, personalYear, personalMonth, personalDay, challenge, maturity, universalYear, universalDay, lunarDay, sign } = allNumbers;
+                const genderText = gender === 'm' ? 'muža' : 'ženy';
+                return `Si komplexná bytosť – a teraz to vidíš na vlastné oči. Tvoje čísla odhaľujú, že si kombináciou ${lifePath} (životná cesta), ${design} (podvedomie) a ${destiny} (osud). Tvoja duša túži po ${soulUrge}, svet ťa vidí ako ${personality}. Tvoja výzva je ${challenge}, v zrelosti sa staneš ${maturity}.\n\nTento rok je pre teba rokom ${personalYear}, tento mesiac ${personalMonth} a dnešok ${personalDay}. Lunárny deň ${lunarDay} a tvoje znamenie ${sign} dotvárajú obraz.\n\nSi presne tam, kde máš byť. A teraz je čas žiť.`;
+            }
+
+            // ================================================================
+            // 4. APP – RIADIACA LOGIKA
+            // ================================================================
+
+            const app = {
+                init() {
+                    this.cacheDom();
+                    this.bindEvents();
+                    this.populateDates();
+                    this.updateLanguage('sk');
+                    this.updateStatusBar();
+                },
+
+                cacheDom() {
+                    this.dom = {
+                        langButtons: document.querySelectorAll('.lang-selector button'),
+                        fullName: document.getElementById('fullName'),
+                        birthDay: document.getElementById('birthDay'),
+                        birthMonth: document.getElementById('birthMonth'),
+                        birthYear: document.getElementById('birthYear'),
+                        genderButtons: document.querySelectorAll('.gender-toggle button'),
+                        btnStart: document.getElementById('btnStart'),
+                        btnRestart: document.getElementById('btnRestart'),
+                        formSection: document.getElementById('formSection'),
+                        resultsContainer: document.getElementById('resultsContainer'),
+                        outputWrapper: document.getElementById('outputWrapper'),
+                        appTitle: document.getElementById('appTitle'),
+                        subBrand: document.getElementById('subBrand'),
+                        liveDate: document.getElementById('lblLiveDate'),
+                        moonIcon: document.getElementById('moonIcon'),
+                        moonPhase: document.getElementById('lblMoonPhase'),
+                        season: document.getElementById('lblSeason'),
+                    };
+                    this.lang = 'sk';
+                    this.gender = 'm';
+                },
+
+                bindEvents() {
+                    this.dom.langButtons.forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            this.updateLanguage(btn.dataset.lang);
+                        });
+                    });
+
+                    this.dom.genderButtons.forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            this.dom.genderButtons.forEach(b => b.classList.remove('active'));
+                            btn.classList.add('active');
+                            this.gender = btn.dataset.gender;
+                            document.body.className = (this.gender === 'f' ? 'female ' : '') + 'hm-grid-bg';
+                        });
+                    });
+
+                    this.dom.btnStart.addEventListener('click', () => this.startAnalysis());
+                    this.dom.btnRestart.addEventListener('click', () => this.restart());
+                    this.dom.fullName.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') this.startAnalysis();
+                    });
+                },
+
+                populateDates() {
+                    const daySel = this.dom.birthDay;
+                    for (let i = 1; i <= 31; i++) {
+                        const opt = document.createElement('option');
+                        opt.value = i;
+                        opt.textContent = i;
+                        daySel.appendChild(opt);
+                    }
+                    const yearSel = this.dom.birthYear;
+                    const curYear = new Date().getFullYear();
+                    for (let y = curYear; y >= 1920; y--) {
+                        const opt = document.createElement('option');
+                        opt.value = y;
+                        opt.textContent = y;
+                        yearSel.appendChild(opt);
+                    }
+                },
+
+                updateLanguage(lang) {
+                    this.lang = lang;
+                    const t = LANG[lang];
+                    if (!t) return;
+
+                    this.dom.langButtons.forEach(btn => {
+                        btn.classList.toggle('active', btn.dataset.lang === lang);
+                    });
+
+                    this.dom.appTitle.textContent = t.title;
+                    this.dom.subBrand.textContent = t.brand;
+                    document.getElementById('lblName').textContent = t.name;
+                    this.dom.fullName.placeholder = t.namePlaceholder;
+                    document.getElementById('lblBirth').textContent = t.birth;
+                    document.getElementById('lblGender').textContent = t.gender;
+                    document.getElementById('lblDateTitle').textContent = t.dateTitle;
+                    document.getElementById('lblMoonTitle').textContent = t.moonTitle;
+                    document.getElementById('lblSeasonTitle').textContent = t.seasonTitle;
+                    this.dom.genderButtons.forEach(btn => {
+                        if (btn.dataset.gender === 'm') btn.textContent = t.male;
+                        else btn.textContent = t.female;
+                    });
+                    this.dom.btnStart.textContent = t.start;
+                    this.dom.btnRestart.textContent = t.restart;
+                },
+
+                updateStatusBar() {
+                    const today = new Date();
+                    const lang = this.lang;
+                    this.dom.liveDate.textContent = today.toLocaleDateString(lang === 'sk' ? 'sk-SK' : lang === 'en' ? 'en-US' : lang === 'de' ? 'de-DE' : 'cs-CZ');
+                    const moonData = this.getMoonPhaseData(today);
+                    this.dom.moonIcon.textContent = moonData.icon;
+                    this.dom.moonPhase.textContent = lang === 'sk' ? moonData.nameSk : moonData.nameEn;
+                    this.dom.season.textContent = this.getSeasonName(today);
+                },
+
+                getMoonPhaseData(date) {
+                    let year = date.getFullYear(),
+                        month = date.getMonth() + 1,
+                        day = date.getDate();
+                    if (month < 3) { year--;
+                        month += 12; }
+                    ++month;
+                    let c = 365.25 * year,
+                        e = 30.6 * month,
+                        jd = c + e + day - 694039.0;
+                    jd /= 29.53058867;
+                    let b = parseInt(jd);
+                    jd -= b;
+                    let phase = Math.round(jd * 8);
+                    if (phase >= 8) phase = 0;
+                    const phases = [
+                        { nameSk: "Nov (Prázdno)", nameEn: "New Moon", icon: "🌑" },
+                        { nameSk: "Dorastajúci srp", nameEn: "Waxing Crescent", icon: "🌒" },
+                        { nameSk: "Prvá štvrť", nameEn: "First Quarter", icon: "🌓" },
+                        { nameSk: "Dorastajúci mesiac", nameEn: "Waxing Gibbous", icon: "🌔" },
+                        { nameSk: "Spln (Max tlak)", nameEn: "Full Moon", icon: "🌕" },
+                        { nameSk: "Cúvajúci mesiac", nameEn: "Waning Gibbous", icon: "🌖" },
+                        { nameSk: "Posledná štvrť", nameEn: "Last Quarter", icon: "🌗" },
+                        { nameSk: "Ubúdajúci srp", nameEn: "Waning Crescent", icon: "🌘" }
+                    ];
+                    return phases[phase];
+                },
+
+                getSeasonName(date) {
+                    let m = date.getMonth() + 1,
+                        d = date.getDate();
+                    const lang = this.lang;
+                    if (lang === 'sk') {
+                        if ((m == 3 && d >= 21) || (m > 3 && m < 6) || (m == 6 && d < 21)) return "Jarná špirála (Vzostup)";
+                        if ((m == 6 && d >= 21) || (m > 6 && m < 9) || (m == 9 && d < 23)) return "Letná špirála (Výkon)";
+                        if ((m == 9 && d >= 23) || (m > 9 && m < 12) || (m == 12 && d < 21)) return "Jeseň (Vyúčtovanie)";
+                        return "Zimná špirála (Korene)";
+                    } else if (lang === 'en') {
+                        if ((m == 3 && d >= 21) || (m > 3 && m < 6) || (m == 6 && d < 21)) return "Spring Spiral (Ascent)";
+                        if ((m == 6 && d >= 21) || (m > 6 && m < 9) || (m == 9 && d < 23)) return "Summer Spiral (Output)";
+                        if ((m == 9 && d >= 23) || (m > 9 && m < 12) || (m == 12 && d < 21)) return "Autumn Spiral (Harvest)";
+                        return "Winter Spiral (Roots)";
+                    } else if (lang === 'de') {
+                        if ((m == 3 && d >= 21) || (m > 3 && m < 6) || (m == 6 && d < 21)) return "Frühlingsspirale (Aufstieg)";
+                        if ((m == 6 && d >= 21) || (m > 6 && m < 9) || (m == 9 && d < 23)) return "Sommerspirale (Leistung)";
+                        if ((m == 9 && d >= 23) || (m > 9 && m < 12) || (m == 12 && d < 21)) return "Herbstspirale (Abrechnung)";
+                        return "Winterspirale (Wurzeln)";
+                    } else {
+                        if ((m == 3 && d >= 21) || (m > 3 && m < 6) || (m == 6 && d < 21)) return "Jarní spirála (Vzestup)";
+                        if ((m == 6 && d >= 21) || (m > 6 && m < 9) || (m == 9 && d < 23)) return "Letní spirála (Výkon)";
+                        if ((m == 9 && d >= 23) || (m > 9 && m < 12) || (m == 12 && d < 21)) return "Podzim (Vyúčtování)";
+                        return "Zimní spirála (Kořeny)";
+                    }
+                },
+
+                startAnalysis() {
+                    const name = this.dom.fullName.value.trim();
+                    const day = parseInt(this.dom.birthDay.value);
+                    const month = parseInt(this.dom.birthMonth.value);
+                    const year = parseInt(this.dom.birthYear.value);
+
+                    if (!name || !day || !month || !year) {
+                        alert(LANG[this.lang].alert);
+                        return;
+                    }
+
+                    const counterKey = (window.location.pathname.match(/\/systems\/([^/]+)\/index\.html$/) || [,'system'])[1] || 'system';
+                    const counters = window.__HM_SYSTEM_USAGE__ || (window.__HM_SYSTEM_USAGE__ = {});
+                    counters[counterKey] = (counters[counterKey] || 0) + 1;
+                    const counterEl = document.getElementById('systemUsageCounter');
+                    if (counterEl) counterEl.textContent = 'Počet použití: ' + counters[counterKey] + 'x';
+
+                    const t = LANG[this.lang];
+                    const today = new Date();
+
+                    // ===== VÝPOČTY =====
+                    const birthStr = `${year}${String(month).padStart(2,'0')}${String(day).padStart(2,'0')}`;
+                    const designStr = getAdjustedDate(year, month, day, -88);
+
+                    const lifePath = numerologySum(birthStr);
+                    const design = numerologySum(designStr);
+                    const destiny = nameToNumber(name);
+                    const soulUrge = getVowelsSum(name);
+                    const personality = getConsonantsSum(name);
+                    const birthday = getBirthdayNumber(day);
+                    const challenge = getChallenge(day, month);
+                    const maturity = getMaturity(lifePath, destiny);
+
+                    const personalYear = getPersonalYear(day, month, year);
+                    const personalMonth = getPersonalMonth(personalYear);
+                    const personalDay = getPersonalDay(personalYear, personalMonth);
+                    const personalWeek = getPersonalWeek(personalYear, personalMonth);
+
+                    const universalYear = getUniversalYear();
+                    const universalDay = getUniversalDay();
+
+                    const lunarDay = getLunarDay(today);
+                    const moonData = this.getMoonPhaseData(today);
+                    const sign = getZodiacSign(month, day);
+
+                    // ===== GENEROVANIE TEXTU =====
+                    const parts = t.parts;
+                    const tags = t.tags;
+                    const gender = this.gender;
+
+                    const coreText = generateCore(lifePath, design, birthday);
+                    const soulText = generateSoul(soulUrge, personality, destiny);
+                    const challengeText = generateChallenge(challenge, maturity);
+                    const yearText = generateYear(personalYear, universalYear);
+                    const monthText = generateMonth(personalMonth);
+                    const todayText = generateToday(personalDay, universalDay, lunarDay);
+                    const moonText = generateMoon(moonData.nameSk, moonData.icon, lunarDay);
+                    const astrologyText = generateAstrology(sign);
+
+                    const allNumbers = { lifePath, design, destiny, soulUrge, personality, personalYear, personalMonth, personalDay, challenge, maturity, universalYear, universalDay, lunarDay, sign };
+                    const synthesisText = generateSynthesis(allNumbers, gender);
+
+                    // ===== ZOBRAZENIE =====
+                    const html = `
+                        <div class="result-block">
+                            <div class="title">${parts.core} <span class="tag">${tags.core}</span></div>
+                            <p>${coreText}</p>
+                        </div>
+                        <div class="result-block">
+                            <div class="title">${parts.soul} <span class="tag">${tags.soul}</span></div>
+                            <p>${soulText}</p>
+                        </div>
+                        <div class="result-block">
+                            <div class="title">${parts.challenge} <span class="tag">${tags.challenge}</span></div>
+                            <p>${challengeText}</p>
+                        </div>
+                        <div class="result-block">
+                            <div class="title">${parts.year} <span class="tag">${tags.year}</span></div>
+                            <p>${yearText}</p>
+                        </div>
+                        <div class="result-block">
+                            <div class="title">${parts.month} <span class="tag">${tags.month}</span></div>
+                            <p>${monthText}</p>
+                        </div>
+                        <div class="result-block">
+                            <div class="title">${parts.today} <span class="tag">${tags.today}</span></div>
+                            <p>${todayText}</p>
+                        </div>
+                        <div class="result-block">
+                            <div class="title">${parts.moon} <span class="tag">${tags.moon}</span></div>
+                            <p>${moonText}</p>
+                        </div>
+                        <div class="result-block">
+                            <div class="title">${parts.astrology} <span class="tag">${tags.astrology}</span></div>
+                            <p>${astrologyText}</p>
+                        </div>
+                        <div class="result-block">
+                            <div class="title">${parts.synthesis} <span class="tag">${tags.synthesis}</span></div>
+                            <p style="white-space:pre-line;">${synthesisText}</p>
+                        </div>
+                    `;
+
+                    this.dom.outputWrapper.innerHTML = html;
+                    this.dom.formSection.style.display = 'none';
+                    this.dom.resultsContainer.classList.add('active');
+                    this.dom.resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                },
+
+                restart() {
+                    this.dom.resultsContainer.classList.remove('active');
+                    this.dom.formSection.style.display = 'block';
+                    this.dom.outputWrapper.innerHTML = '';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            };
+
+            document.addEventListener('DOMContentLoaded', () => app.init());
+            window.app = app;
+        })();
+    </script>
+    <script src="../../js/common-systems.js"></script>
+</body>
+</html>

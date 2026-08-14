@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Human Maintenance — Navigátor Integrity</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #060810;
+            --card: #0d1428;
+            --border: #1e2a4a;
+            --text: #e8edf5;
+            --muted: #6a7a9a;
+            --accent: #38bdf8;
+            --glow: rgba(56, 189, 248, 0.15);
+            --radius: 18px;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body.female {
+            --accent: #f472b6;
+            --glow: rgba(244, 114, 182, 0.15);
+        }
+
+        .app {
+            max-width: 720px;
+            width: 100%;
+            background: var(--card);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 28px 24px 20px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #7abfff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo span {
+            display: block;
+            font-size: 0.65rem;
+            font-weight: 400;
+            color: var(--muted);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            -webkit-text-fill-color: var(--muted);
+        }
+
+        .lang-selector {
+            display: flex;
+            gap: 3px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 30px;
+            padding: 3px;
+            border: 1px solid var(--border);
+        }
+
+        .lang-selector button {
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.25s;
+            text-transform: uppercase;
+        }
+
+        .lang-selector button.active {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 0 20px var(--glow);
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, var(--glow), var(--card));
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            border-radius: 14px;
+            padding: 20px 24px;
+            margin-bottom: 24px;
+            color: #e2e8f0;
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+
+        .info-box strong {
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.8rem;
+        }
+
+        .form-section {
+            margin-bottom: 6px;
+        }
+
+        .form-section.hidden {
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--muted);
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 13px 16px;
+            background: #080c1a;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 1rem;
+            transition: 0.3s;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--glow);
+        }
+
+        .form-group input::placeholder {
+            color: var(--muted);
+            opacity: 0.4;
+        }
+
+        .date-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1.4fr;
+            gap: 10px;
+        }
+
+        .date-row select {
+            padding: 13px 10px;
+            background: #080c1a;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        .date-row select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--glow);
+        }
+
+        .gender-toggle {
+            display: flex;
+            gap: 10px;
+            background: #080c1a;
+            border-radius: 12px;
+            padding: 4px;
+            border: 1px solid var(--border);
+        }
+
+        .gender-toggle button {
+            flex: 1;
+            padding: 10px 0;
+            border: none;
+            background: transparent;
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        .gender-toggle button.active {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 0 20px var(--glow);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: var(--accent);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            margin-top: 6px;
+            box-shadow: 0 0 30px var(--glow);
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.01);
+            box-shadow: 0 0 50px var(--glow);
+        }
+
+        .results-container {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .results-container.active {
+            display: block;
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-block {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 22px 20px;
+            margin-bottom: 16px;
+            transition: border-color 0.3s;
+            border-left: 3px solid var(--accent);
+        }
+
+        .result-block .title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-block .title .tag {
+            font-size: 0.55rem;
+            color: var(--muted);
+            background: rgba(255, 255, 255, 0.04);
+            padding: 2px 12px;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .result-block p {
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: #d0d8e8;
+            margin-top: 4px;
+        }
+
+        .result-block .highlight {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .btn-restart {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--muted);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.3s;
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .btn-restart:hover {
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        .footer {
+            margin-top: 28px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            font-size: 0.6rem;
+            color: var(--muted);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .footer strong {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        @media (max-width: 480px) {
+            .app {
+                padding: 18px 14px 16px;
+            }
+
+            .logo h1 {
+                font-size: 1.2rem;
+            }
+
+            .result-block {
+                padding: 16px 14px;
+            }
+
+            .result-block p {
+                font-size: 0.9rem;
+            }
+
+            .date-row {
+                grid-template-columns: 1fr 1fr 1.2fr;
+                gap: 6px;
+            }
+
+            .date-row select {
+                padding: 11px 6px;
+                font-size: 0.9rem;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .lang-selector {
+                align-self: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app" id="app">
+        <div class="header">
+            <div class="logo">
+                <h1 id="appTitle">Navigátor Integrity</h1>
+                <span id="subBrand">The Human Maintenance</span>
+            </div>
+            <div class="lang-selector" id="langSelector">
+                <button class="active" data-lang="sk">SK</button>
+                <button data-lang="en">EN</button>
+                <button data-lang="de">DE</button>
+                <button data-lang="cz">CZ</button>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <strong id="infoTitle">🌱 Krok 2: Priestor po tichu</strong>
+            <p id="infoText">Ak máš za sebou sken tieňa a cítiš prázdno alebo ťažobu, toto nie je miesto na ďalšie bičovanie ega. Toto je konštruktívna mapa. Žiadne skryté poplatky, žiadna manipulácia ani závislosť na systéme. Zadaj svoje údaje a použi tento nástroj na to, aby si premostil medzeru medzi starým vzorcom a čistým konaním.</p>
+        </div>
+
+        <div class="form-section" id="formSection">
+            <div class="form-group">
+                <label id="lblName">Celé meno a priezvisko</label>
+                <input type="text" id="fullName" placeholder="napr. Július Kováč">
+            </div>
+            <div class="form-group">
+                <label id="lblBirth">Dátum narodenia</label>
+                <div class="date-row">
+                    <select id="birthDay"><option value="">Deň</option></select>
+                    <select id="birthMonth">
+                        <option value="">Mesiac</option>
+                        <option value="1">Január</option><option value="2">Február</option>
+                        <option value="3">Marec</option><option value="4">Apríl</option>
+                        <option value="5">Máj</option><option value="6">Jún</option>
+                        <option value="7">Júl</option><option value="8">August</option>
+                        <option value="9">September</option><option value="10">Október</option>
+                        <option value="11">November</option><option value="12">December</option>
+                    </select>
+                    <select id="birthYear"><option value="">Rok</option></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label id="lblGender">Polarita</label>
+                <div class="gender-toggle" id="genderToggle">
+                    <button class="active" data-gender="m">⚡ Muž</button>
+                    <button data-gender="f">🌸 Žena</button>
+                </div>
+            </div>
+            <button class="btn-primary" id="btnStart">✦ Otvoriť integračný protokol</button>
+        </div>
+
+        <div class="results-container" id="resultsContainer">
+            <div id="outputWrapper"></div>
+            <button class="btn-restart" id="btnRestart">↺ Začať odznova</button>
+        </div>
+
+        <div class="footer">
+            <strong>Grizzly Courage</strong> · The Human Maintenance
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ================================================================
+            // 1. JAZYKOVÉ PREKLADY
+            // ================================================================
+            const LANG = {
+                sk: {
+                    title: 'Navigátor Integrity',
+                    brand: 'The Human Maintenance',
+                    name: 'Celé meno a priezvisko',
+                    namePlaceholder: 'napr. Július Kováč',
+                    birth: 'Dátum narodenia',
+                    gender: 'Polarita',
+                    male: '⚡ Muž',
+                    female: '🌸 Žena',
+                    start: '✦ Otvoriť integračný protokol',
+                    restart: '↺ Začať odznova',
+                    alert: 'Prosím, vyplňte meno a dátum narodenia.',
+                    infoTitle: '🌱 Krok 2: Priestor po tichu',
+                    infoText: 'Ak máš za sebou sken tieňa a cítiš prázdno alebo ťažobu, toto nie je miesto na ďalšie bičovanie ega. Toto je konštruktívna mapa. Žiadne skryté poplatky, žiadna manipulácia ani závislosť na systéme. Zadaj svoje údaje a použi tento nástroj na to, aby si premostil medzeru medzi starým vzorcom a čistým konaním.',
+                    parts: {
+                        trigger: '1. Identifikácia spúšťača',
+                        decode: '2. Dekódovanie emócie',
+                        pause: '3. Nástroj prvej pomoci',
+                        redirect: '4. Presmerovanie energie',
+                        compassion: '5. Zavedenie súcitu',
+                        action: '6. Konštruktívny krok',
+                        daily: '7. Denný kód stability',
+                        sovereign: '8. Definitívny manifest'
+                    },
+                    tags: {
+                        trigger: 'kde zapína ego',
+                        decode: 'strach vs. pýcha',
+                        pause: 'ticho a dych',
+                        redirect: 'tlak verzus pokoj',
+                        compassion: 'mäkkosť k sebe',
+                        action: 'jedna čistá akcia',
+                        daily: 'aktuálna priorita',
+                        sovereign: 'sloboda bez manipulácie'
+                    }
+                },
+                en: {
+                    title: 'Navigator of Integrity',
+                    brand: 'The Human Maintenance',
+                    name: 'Full Name',
+                    namePlaceholder: 'e.g. John Doe',
+                    birth: 'Date of Birth',
+                    gender: 'Polarity',
+                    male: '⚡ Male',
+                    female: '🌸 Female',
+                    start: '✦ Open Integration Protocol',
+                    restart: '↺ Start Over',
+                    alert: 'Please fill in your name and date of birth.',
+                    infoTitle: '🌱 Step 2: Space after silence',
+                    infoText: 'If you have done a shadow scan and feel emptiness or heaviness, this is not a place for further ego-whipping. This is a constructive map. No hidden fees, no manipulation or dependency on the system. Enter your data and use this tool to bridge the gap between the old pattern and clean action.',
+                    parts: {
+                        trigger: '1. Trigger Identification',
+                        decode: '2. Emotion Decoding',
+                        pause: '3. First Aid Tool',
+                        redirect: '4. Energy Redirection',
+                        compassion: '5. Introducing Compassion',
+                        action: '6. Constructive Step',
+                        daily: '7. Daily Stability Code',
+                        sovereign: '8. Definitive Manifest'
+                    },
+                    tags: {
+                        trigger: 'where ego switches on',
+                        decode: 'fear vs. pride',
+                        pause: 'silence and breath',
+                        redirect: 'pressure vs. peace',
+                        compassion: 'softness to self',
+                        action: 'one clean action',
+                        daily: 'current priority',
+                        sovereign: 'freedom without manipulation'
+                    }
+                },
+                de: {
+                    title: 'Integritäts-Navigator',
+                    brand: 'The Human Maintenance',
+                    name: 'Vollständiger Name',
+                    namePlaceholder: 'z.B. Julius Kováč',
+                    birth: 'Geburtsdatum',
+                    gender: 'Polarität',
+                    male: '⚡ Männlich',
+                    female: '🌸 Weiblich',
+                    start: '✦ Integrationsprotokoll öffnen',
+                    restart: '↺ Neu beginnen',
+                    alert: 'Bitte geben Sie Namen und Geburtsdatum ein.',
+                    infoTitle: '🌱 Schritt 2: Raum nach der Stille',
+                    infoText: 'Wenn du den Schatten-Scan hinter dir hast und Leere oder Schwere spürst, ist dies nicht der Ort für weitere Ego-Peitschen. Dies ist eine konstruktive Landkarte. Keine versteckten Gebühren, keine Manipulation oder Abhängigkeit vom System. Gib deine Daten ein und nutze dieses Werkzeug, um die Lücke zwischen dem alten Muster und reinem Handeln zu überbrücken.',
+                    parts: {
+                        trigger: '1. Auslöser-Identifikation',
+                        decode: '2. Emotions-Dekodierung',
+                        pause: '3. Erste-Hilfe-Werkzeug',
+                        redirect: '4. Energie-Umleitung',
+                        compassion: '5. Mitgefühl einführen',
+                        action: '6. Konstruktiver Schritt',
+                        daily: '7. Täglicher Stabilitäts-Code',
+                        sovereign: '8. Definitives Manifest'
+                    },
+                    tags: {
+                        trigger: 'wo das Ego einschaltet',
+                        decode: 'Angst vs. Stolz',
+                        pause: 'Stille und Atem',
+                        redirect: 'Druck vs. Frieden',
+                        compassion: 'Sanftheit zu sich selbst',
+                        action: 'eine reine Handlung',
+                        daily: 'aktuelle Priorität',
+                        sovereign: 'Freiheit ohne Manipulation'
+                    }
+                },
+                cz: {
+                    title: 'Navigátor Integrity',
+                    brand: 'The Human Maintenance',
+                    name: 'Celé jméno a příjmení',
+                    namePlaceholder: 'např. Julius Kováč',
+                    birth: 'Datum narození',
+                    gender: 'Polarita',
+                    male: '⚡ Muž',
+                    female: '🌸 Žena',
+                    start: '✦ Otevřít integrační protokol',
+                    restart: '↺ Začít znovu',
+                    alert: 'Prosím, vyplňte jméno a datum narození.',
+                    infoTitle: '🌱 Krok 2: Prostor po tichu',
+                    infoText: 'Pokud máš za sebou sken stínu a cítíš prázdno nebo tíhu, toto není místo pro další bičování ega. Toto je konstruktivní mapa. Žádné skryté poplatky, žádná manipulace ani závislost na systému. Zadej své údaje a použij tento nástroj k překlenutí mezery mezi starým vzorcem a čistým jednáním.',
+                    parts: {
+                        trigger: '1. Identifikace spouštěče',
+                        decode: '2. Dekódování emoce',
+                        pause: '3. Nástroj první pomoci',
+                        redirect: '4. Přesměrování energie',
+                        compassion: '5. Zavedení soucitu',
+                        action: '6. Konstruktivní krok',
+                        daily: '7. Denní kód stability',
+                        sovereign: '8. Definitivní manifest'
+                    },
+                    tags: {
+                        trigger: 'kde zapíná ego',
+                        decode: 'strach vs. pýcha',
+                        pause: 'ticho a dech',
+                        redirect: 'tlak versus klid',
+                        compassion: 'měkkost k sobě',
+                        action: 'jedna čistá akce',
+                        daily: 'aktuální priorita',
+                        sovereign: 'svoboda bez manipulace'
+                    }
+                }
+            };
+
+            // ================================================================
+            // 2. NUMEROLOGICKÉ FUNKCIE
+            // ================================================================
+            function numerologySum(str) {
+                let sum = 0;
+                for (let ch of str) {
+                    let d = parseInt(ch);
+                    if (!isNaN(d)) sum += d;
+                }
+                while (sum > 9 && sum !== 11 && sum !== 22 && sum !== 33) {
+                    sum = String(sum).split('').reduce((a, b) => parseInt(a) + parseInt(b), 0);
+                }
+                return sum;
+            }
+
+            function nameToNumber(name) {
+                const map = {
+                    'a': 1, 'á': 1, 'ä': 1, 'b': 2, 'c': 3, 'č': 3, 'd': 4, 'ď': 4,
+                    'e': 5, 'é': 5, 'ě': 5, 'f': 6, 'g': 7, 'h': 8, 'ch': 8, 'i': 9,
+                    'í': 9, 'j': 1, 'k': 2, 'l': 3, 'm': 4, 'n': 5, 'ň': 5, 'o': 6,
+                    'ó': 6, 'ô': 6, 'p': 7, 'q': 8, 'r': 9, 'ř': 9, 's': 1, 'š': 1,
+                    't': 2, 'ť': 2, 'u': 3, 'ú': 3, 'ů': 3, 'v': 4, 'w': 5, 'x': 6,
+                    'y': 7, 'ý': 7, 'z': 8, 'ž': 8
+                };
+                let clean = name.toLowerCase().replace(/[^a-záäčďéěíňóôřšťúůýž]/g, '');
+                let sum = 0;
+                for (let ch of clean) {
+                    if (map[ch]) sum += map[ch];
+                }
+                while (sum > 9 && sum !== 11 && sum !== 22 && sum !== 33) {
+                    sum = String(sum).split('').reduce((a, b) => parseInt(a) + parseInt(b), 0);
+                }
+                return sum;
+            }
+
+            function getVowelsSum(name) {
+                const vowels = 'aeiouyáäéíóôúý';
+                let sum = 0;
+                let clean = name.toLowerCase().replace(/[^a-záäčďéěíňóôřšťúůýž]/g, '');
+                for (let ch of clean) {
+                    if (vowels.includes(ch)) {
+                        const map = {
+                            'a': 1, 'á': 1, 'ä': 1, 'e': 5, 'é': 5, 'ě': 5,
+                            'i': 9, 'í': 9, 'o': 6, 'ó': 6, 'ô': 6, 'u': 3,
+                            'ú': 3, 'ů': 3, 'y': 7, 'ý': 7
+                        };
+                        sum += map[ch] || 0;
+                    }
+                }
+                while (sum > 9 && sum !== 11 && sum !== 22 && sum !== 33) {
+                    sum = String(sum).split('').reduce((a, b) => parseInt(a) + parseInt(b), 0);
+                }
+                return sum;
+            }
+
+            function getConsonantsSum(name) {
+                const vowels = 'aeiouyáäéíóôúý';
+                let sum = 0;
+                let clean = name.toLowerCase().replace(/[^a-záäčďéěíňóôřšťúůýž]/g, '');
+                for (let ch of clean) {
+                    if (!vowels.includes(ch)) {
+                        const map = {
+                            'b': 2, 'c': 3, 'č': 3, 'd': 4, 'ď': 4, 'f': 6,
+                            'g': 7, 'h': 8, 'ch': 8, 'j': 1, 'k': 2, 'l': 3,
+                            'm': 4, 'n': 5, 'ň': 5, 'p': 7, 'q': 8, 'r': 9,
+                            'ř': 9, 's': 1, 'š': 1, 't': 2, 'ť': 2, 'v': 4,
+                            'w': 5, 'x': 6, 'z': 8, 'ž': 8
+                        };
+                        sum += map[ch] || 0;
+                    }
+                }
+                while (sum > 9 && sum !== 11 && sum !== 22 && sum !== 33) {
+                    sum = String(sum).split('').reduce((a, b) => parseInt(a) + parseInt(b), 0);
+                }
+                return sum;
+            }
+
+            function getAdjustedDate(year, month, day, daysOffset) {
+                const d = new Date(year, month - 1, day);
+                d.setDate(d.getDate() + daysOffset);
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const dd = String(d.getDate()).padStart(2, '0');
+                return `${y}${m}${dd}`;
+            }
+
+            function getPersonalYear(day, month, year) {
+                const currentYear = new Date().getFullYear();
+                const sum = numerologySum(String(day) + String(month) + String(currentYear));
+                return sum;
+            }
+
+            function getPersonalMonth(personalYear) {
+                const currentMonth = new Date().getMonth() + 1;
+                const sum = numerologySum(String(personalYear) + String(currentMonth));
+                return sum;
+            }
+
+            function getPersonalDay(personalYear, personalMonth) {
+                const currentDay = new Date().getDate();
+                const sum = numerologySum(String(personalYear) + String(personalMonth) + String(currentDay));
+                return sum;
+            }
+
+            function getChallenge(day, month) {
+                const diff = Math.abs(parseInt(day) - parseInt(month));
+                return numerologySum(String(diff));
+            }
+
+            function getMaturity(lifePath, destiny) {
+                return numerologySum(String(lifePath + destiny));
+            }
+
+            // ================================================================
+            // 3. GENERÁTORY TEXTU – INTEGRAČNÝ PROTOKOL (8 ČASTÍ)
+            // ================================================================
+
+            // ---- 1. Spúšťač ----
+            function generateTrigger(lifePath, challenge) {
+                const base = {
+                    1: 'Tvoj spúšťač je, keď niekto spochybní tvoju autoritu. Ego sa okamžite postaví do bojového módu.',
+                    2: 'Tvoj spúšťač je, keď cítiš, že ťa niekto nepočúva alebo nerešpektuje. Reaguješ tichým vzdorom.',
+                    3: 'Tvoj spúšťač je, keď tvoje slová nemajú odozvu. Začínaš byť prehnane výrečný alebo sarkastický.',
+                    4: 'Tvoj spúšťač je chaos a neporiadok. Keď sa veci vymknú spod kontroly, zatneš sa a tlačíš ďalej.',
+                    5: 'Tvoj spúšťač je nuda a stereotyp. Keď sa cítiš uväznený, unikáš do akcie alebo rozptýlenia.',
+                    6: 'Tvoj spúšťač je, keď vidíš niekoho trpieť alebo keď sa cítiš nepotrebný. Reaguješ prehnanou starostlivosťou.',
+                    7: 'Tvoj spúšťač je, keď cítiš, že ťa niekto podceňuje intelektuálne. Uzatváraš sa do seba a analyzuješ.',
+                    8: 'Tvoj spúšťač je, keď stratíš kontrolu nad financiami alebo postavením. Prepínaš do režimu boja o prežitie.',
+                    9: 'Tvoj spúšťač je nespravodlivosť a krivda. Emocionálne ťa to rozkýve a chceš to napraviť hneď a za každú cenu.'
+                };
+                const specific = {
+                    1: ' Tvoja výzva: naučiť sa, že tvoja hodnota nie je v tom, že máš vždy pravdu.',
+                    2: ' Tvoja výzva: naučiť sa, že tichá spolupráca je niekedy silnejšia než odpor.',
+                    3: ' Tvoja výzva: naučiť sa, že nie všetko potrebuje komentár – niekedy stačí len byť.',
+                    4: ' Tvoja výzva: naučiť sa, že nie všetko sa dá kontrolovať – a to je v poriadku.',
+                    5: ' Tvoja výzva: naučiť sa, že sloboda nie je v úteku, ale v prijatí.',
+                    6: ' Tvoja výzva: naučiť sa, že aj ty potrebuješ starostlivosť – a nie je to sebectvo.',
+                    7: ' Tvoja výzva: naučiť sa, že nie všetko sa dá pochopiť rozumom – niekedy treba cítiť.',
+                    8: ' Tvoja výzva: naučiť sa, že tvoja hodnota nie je v tom, čo vlastníš, ale v tom, kto si.',
+                    9: ' Tvoja výzva: naučiť sa, že nie všetko sa dá napraviť – a to je súčasť života.'
+                };
+                const baseText = base[lifePath] || base[1];
+                const specificText = specific[challenge] || specific[1];
+                return baseText + ' ' + specificText;
+            }
+
+            // ---- 2. Dekódovanie emócie ----
+            function generateDecode(destiny, personality) {
+                const fear = {
+                    1: 'Strach, že nebudeš mať kontrolu.',
+                    2: 'Strach, že ťa nebudú mať radi.',
+                    3: 'Strach, že tvoje slová nemajú váhu.',
+                    4: 'Strach, že všetko stratíš.',
+                    5: 'Strach zo zajatia a nudy.',
+                    6: 'Strach, že si zbytočný.',
+                    7: 'Strach z vlastnej hlúposti.',
+                    8: 'Strach zo slabosti.',
+                    9: 'Strach, že si sám.'
+                };
+                const pride = {
+                    1: 'Pýcha na svoju nezávislosť a silu.',
+                    2: 'Pýcha na svoju jemnosť a citlivosť.',
+                    3: 'Pýcha na svoju výrečnosť a charizmu.',
+                    4: 'Pýcha na svoju spoľahlivosť a vytrvalosť.',
+                    5: 'Pýcha na svoju slobodu a dobrodružnosť.',
+                    6: 'Pýcha na svoju starostlivosť a obetavosť.',
+                    7: 'Pýcha na svoju múdrosť a analytickosť.',
+                    8: 'Pýcha na svoju moc a úspech.',
+                    9: 'Pýcha na svoju empatiu a humanizmus.'
+                };
+                const f = fear[destiny] || fear[1];
+                const p = pride[personality] || pride[1];
+                return `Pod povrchom tvojich reakcií sa často skrýva ${f}. Ale tvoje ego to prekrýva ${p}. Skús nabudúce, keď cítiš nával emócií, spýtať sa: "Čo sa naozaj deje? Je to strach, alebo pýcha?"`;
+            }
+
+            // ---- 3. Nástroj prvej pomoci ----
+            function generatePause(soulUrge, maturity) {
+                const pauseText = {
+                    1: 'Keď cítiš, že strácaš kontrolu, zastav sa a trikrát sa pomaly nadýchni. Zameraj sa na ticho medzi nádychmi. Tvoj pokoj je v tom, že nič nemusíš riešiť hneď.',
+                    2: 'Keď cítiš tlak, urob krok vzad – fyzicky aj mentálne. Predstav si, že sa pozeráš na situáciu z výšky. Tvoje emócie sú len vlny, ty si oceán.',
+                    3: 'Keď cítiš, že ťa emócie preťažujú, povedz si: "Toto nie som ja, to je len môj starý vzorec." A daj si 10 sekúnd ticha. To ticho preruší automatickú reakciu.',
+                    4: 'Keď cítiš vztek alebo frustráciu, polož ruku na srdce a sústreď sa na dych. Povedz si: "Som v bezpečí. Toto prejde."',
+                    5: 'Keď cítiš nutkanie utiecť alebo niečo zmeniť, zastav sa a spýtaj sa: "Čo by som robil, keby som nemal strach?" Potom dýchaj.',
+                    6: 'Keď cítiš, že sa obetuješ alebo preberáš zodpovednosť za iných, polož si otázku: "Je to naozaj moja zodpovednosť?" A dýchaj.',
+                    7: 'Keď cítiš, že sa strácaš v myšlienkach, vráť sa k dychu. Sústreď sa na fyzické vnemy – nohy na zemi, vzduch v pľúcach. To ťa uzemní.',
+                    8: 'Keď cítiš, že ti uniká kontrola, predstav si, že držíš v ruke malý kamienok. Sústreď sa na jeho hmotnosť. Toto je tvoj kotva.',
+                    9: 'Keď cítiš, že ťa emócie zaplavujú, povedz si: "Môžem to cítiť, ale nemusím tomu uveriť." A dýchaj.'
+                };
+                const maturityText = {
+                    1: ' Tvoja zrelosť ti hovorí, že najväčšia sila je v pokoji.',
+                    2: ' Tvoja zrelosť ti hovorí, že harmónia začína v tebe.',
+                    3: ' Tvoja zrelosť ti hovorí, že radosť je v prítomnosti.',
+                    4: ' Tvoja zrelosť ti hovorí, že stabilita je v tvojom vnútri.',
+                    5: ' Tvoja zrelosť ti hovorí, že sloboda je v prijatí.',
+                    6: ' Tvoja zrelosť ti hovorí, že láska je v tvojom pokoji.',
+                    7: ' Tvoja zrelosť ti hovorí, že múdrosť je v tichu.',
+                    8: ' Tvoja zrelosť ti hovorí, že moc je v službe.',
+                    9: ' Tvoja zrelosť ti hovorí, že naplnenie je v tvojom vnútri.'
+                };
+                const base = pauseText[soulUrge] || pauseText[1];
+                const mat = maturityText[maturity] || maturityText[1];
+                return base + ' ' + mat;
+            }
+
+            // ---- 4. Presmerovanie energie ----
+            function generateRedirect(lifePath, destiny) {
+                const base = {
+                    1: 'Tvoja energia je ako riečny prúd – keď ju neusmerníš, rozleje sa. Najlepšie ju využiješ, keď sa zameráš na jeden cieľ.',
+                    2: 'Tvoja energia je jemná, ale vytrvalá. Presmeruj ju do budovania vzťahov a spolupráce – tam nájdeš svoju silu.',
+                    3: 'Tvoja energia je tvorivá a explozívna. Namiesto toho, aby si ju míňal na argumenty, tvori – píš, kresli, rozprávaj príbehy.',
+                    4: 'Tvoja energia je praktická a sústredená. Presmeruj ju do práce, ktorá má zmysel – do budovania niečoho trvalého.',
+                    5: 'Tvoja energia je divoká a neposedná. Namiesto úteku ju presmeruj do objavovania – cestuj, uč sa, spoznávaj nové veci.',
+                    6: 'Tvoja energia je starostlivá a obetavá. Presmeruj ju najprv na seba – až potom na druhých. Inak vyhoríš.',
+                    7: 'Tvoja energia je analytická a hlboká. Presmeruj ju do štúdia a reflexie – tam nájdeš odpovede, ktoré hľadáš.',
+                    8: 'Tvoja energia je mocná a sústredená. Presmeruj ju do vedenia a zodpovednosti – ale s pokorou.',
+                    9: 'Tvoja energia je empatická a idealistická. Presmeruj ju do služby – ale nezabúdaj na seba.'
+                };
+                const specific = {
+                    1: ' Tvoj osud ti hovorí, že tvoja cesta je o tvorbe, nie o ničení.',
+                    2: ' Tvoj osud ti hovorí, že tvoja cesta je o spolupráci, nie o samote.',
+                    3: ' Tvoj osud ti hovorí, že tvoja cesta je o radosti, nie o boji.',
+                    4: ' Tvoj osud ti hovorí, že tvoja cesta je o stabilite, nie o chaose.',
+                    5: ' Tvoj osud ti hovorí, že tvoja cesta je o slobode, nie o úteku.',
+                    6: ' Tvoj osud ti hovorí, že tvoja cesta je o láske, nie o obete.',
+                    7: ' Tvoj osud ti hovorí, že tvoja cesta je o múdrosti, nie o izolácii.',
+                    8: ' Tvoj osud ti hovorí, že tvoja cesta je o moci, nie o tyranii.',
+                    9: ' Tvoj osud ti hovorí, že tvoja cesta je o humanizme, nie o obetavosti.'
+                };
+                const baseText = base[lifePath] || base[1];
+                const specText = specific[destiny] || specific[1];
+                return baseText + ' ' + specText;
+            }
+
+            // ---- 5. Súcit ----
+            function generateCompassion(soulUrge, challenge) {
+                const base = {
+                    1: 'Keď zlyháš, povedz si: "Som človek, robím chyby. To neznamená, že nemám hodnotu."',
+                    2: 'Keď cítiš vinu, povedz si: "Odpúšťam si. Minulosť nemôžem zmeniť, ale prítomnosť áno."',
+                    3: 'Keď sa cítiš nedostatočný, povedz si: "Som dosť dobrý presne taký, aký som."',
+                    4: 'Keď sa cítiš preťažený, povedz si: "Mám právo oddýchnuť si. Nie som stroj."',
+                    5: 'Keď sa cítiš stratený, povedz si: "Je v poriadku nevedieť všetko. Dôležité je ísť ďalej."',
+                    6: 'Keď sa cítiš zanedbaný, povedz si: "Zaslúžim si lásku a starostlivosť – od seba aj od iných."',
+                    7: 'Keď sa cítiš sám, povedz si: "Nie som sám. Každý človek bojuje svoj boj."',
+                    8: 'Keď sa cítiš slabý, povedz si: "Aj silní majú právo na odpočinok a podporu."',
+                    9: 'Keď sa cítiš zbytočný, povedz si: "Môj život má zmysel – aj keď ho práve nevidím."'
+                };
+                const challengeText = {
+                    1: ' Tvoja výzva je naučiť sa prijímať pomoc.',
+                    2: ' Tvoja výzva je naučiť sa hovoriť o svojich pocitoch.',
+                    3: ' Tvoja výzva je naučiť sa počúvať svoje potreby.',
+                    4: ' Tvoja výzva je naučiť sa povedať "nie".',
+                    5: ' Tvoja výzva je naučiť sa zostať pri veci.',
+                    6: ' Tvoja výzva je naučiť sa prijímať od druhých.',
+                    7: ' Tvoja výzva je naučiť sa dôverovať procesu.',
+                    8: ' Tvoja výzva je naučiť sa, že slabosť nie je zlyhanie.',
+                    9: ' Tvoja výzva je naučiť sa, že aj ty si dôležitý.'
+                };
+                const baseText = base[soulUrge] || base[1];
+                const challText = challengeText[challenge] || challengeText[1];
+                return baseText + ' ' + challText;
+            }
+
+            // ---- 6. Konštruktívny krok ----
+            function generateAction(personalYear, personalMonth) {
+                const yearText = {
+                    1: 'Tento rok je o nových začiatkoch. Urob dnes jeden krok smerom k niečomu, čo si odkladal.',
+                    2: 'Tento rok je o spolupráci. Dnes sa spoj s niekým, kto ti môže pomôcť.',
+                    3: 'Tento rok je o kreativite. Dnes venuj aspoň 15 minút niečomu, čo ťa napĺňa.',
+                    4: 'Tento rok je o budovaní. Dnes urob jeden praktický krok k svojmu dlhodobému cieľu.',
+                    5: 'Tento rok je o zmene. Dnes vyskúšaj niečo nové – aj malá zmena môže zmeniť veľa.',
+                    6: 'Tento rok je o láske a zodpovednosti. Dnes venuj čas niekomu, na kom ti záleží.',
+                    7: 'Tento rok je o vnútornom raste. Dnes si nájdi 10 minút ticha a počúvaj svoje vnútro.',
+                    8: 'Tento rok je o moci a kariére. Dnes urob jeden krok smerom k svojmu profesionálnemu cieľu.',
+                    9: 'Tento rok je o zavŕšení. Dnes uzavri niečo, čo ťa už dlho ťaží.'
+                };
+                const monthText = {
+                    1: ' Tento mesiac sa zameraj na odvahu – malé víťazstvá vedú k veľkým.',
+                    2: ' Tento mesiac sa zameraj na spoluprácu – spoločné sily sú silnejšie.',
+                    3: ' Tento mesiac sa zameraj na radosť – nájdi si čas na to, čo ťa baví.',
+                    4: ' Tento mesiac sa zameraj na prácu – každý krok sa počíta.',
+                    5: ' Tento mesiac sa zameraj na zmenu – otvor sa novým možnostiam.',
+                    6: ' Tento mesiac sa zameraj na vzťahy – investuj do tých, ktoré ťa napĺňajú.',
+                    7: ' Tento mesiac sa zameraj na seba – introspekcia ti prinesie odpovede.',
+                    8: ' Tento mesiac sa zameraj na výsledky – tvoja práca prináša ovocie.',
+                    9: ' Tento mesiac sa zameraj na odpustenie – zbav sa starých bŕzd.'
+                };
+                const y = yearText[personalYear] || yearText[1];
+                const m = monthText[personalMonth] || monthText[1];
+                return y + ' ' + m;
+            }
+
+            // ---- 7. Denný kód stability ----
+            function generateDaily(personalDay, lifePath) {
+                const dayText = {
+                    1: 'Dnešný deň je o odvahe. Sprav niečo, čo si dlho odkladal – aj malý krok je víťazstvo.',
+                    2: 'Dnešný deň je o spolupráci. Spoj sa s niekým, kto ti môže pomôcť, alebo pomôž ty jemu.',
+                    3: 'Dnešný deň je o radosti. Nájdi si chvíľu na to, čo ťa naozaj baví.',
+                    4: 'Dnešný deň je o práci. Sústreď sa na jednu vec a dotiahni ju do konca.',
+                    5: 'Dnešný deň je o zmene. Otvor sa niečomu novému – aj malej zmene.',
+                    6: 'Dnešný deň je o láske. Venuj pozornosť niekomu, na kom ti záleží.',
+                    7: 'Dnešný deň je o tichu. Nájdi si čas pre seba – bez mobilu, bez ľudí.',
+                    8: 'Dnešný deň je o výsledkoch. Zbieraj plody svojej práce – zaslúžiš si ich.',
+                    9: 'Dnešný deň je o odpúšťaní. Nechaj minulosť minulosťou.'
+                };
+                const lifeText = {
+                    1: ' Tvoja životná cesta ti pripomína, že si vodca – ale vodca vedie aj sám seba.',
+                    2: ' Tvoja životná cesta ti pripomína, že tvoja sila je v spolupráci.',
+                    3: ' Tvoja životná cesta ti pripomína, že tvoja radosť je tvojou najväčšou silou.',
+                    4: ' Tvoja životná cesta ti pripomína, že tvoja vytrvalosť ťa dovedie ďaleko.',
+                    5: ' Tvoja životná cesta ti pripomína, že tvoja sloboda je v tvojom rozhodnutí.',
+                    6: ' Tvoja životná cesta ti pripomína, že tvoja starostlivosť je tvojím darom.',
+                    7: ' Tvoja životná cesta ti pripomína, že tvoja múdrosť je v tvojom tichu.',
+                    8: ' Tvoja životná cesta ti pripomína, že tvoja moc je v tvojej pokore.',
+                    9: ' Tvoja životná cesta ti pripomína, že tvoje poslanie je v tvojej službe.'
+                };
+                const d = dayText[personalDay] || dayText[1];
+                const l = lifeText[lifePath] || lifeText[1];
+                return d + ' ' + l;
+            }
+
+            // ---- 8. Definitívny manifest ----
+            function generateSovereign(allNumbers) {
+                const intro = "Tento nástroj končí tam, kde začína tvoj skutočný život. Žiadne algoritmy, žiadne aplikácie ani externí 'guruovia' ti nepovedia, ako máš žiť. Celý tento systém bol len zrkadlo postavené na matematike, aby ti ukázalo, že tvoje vzorce sú predvídateľné len vtedy, ak ich nepoznáš.";
+                const middle = "Súčasťou skutočnej slobody je odpojiť sa, zavrieť túto záložku a ísť robiť dobré veci v reálnom svete. Si slobodný. Použi túto slobodu múdre a s čistým súcitom.";
+                const personalized = " Tvoje čísla ti ukázali, kde sú tvoje slabé miesta – ale aj tvoju silu. Teraz je na tebe, či to využiješ na zmenu, alebo na ďalšie utvrdzovanie sa v starých vzorcoch.";
+                return intro + '\n\n' + middle + '\n\n' + personalized;
+            }
+
+            // ================================================================
+            // 4. APP – RIADIACA LOGIKA
+            // ================================================================
+            const app = {
+                init() {
+                    this.cacheDom();
+                    this.bindEvents();
+                    this.populateDates();
+                    this.updateLanguage('sk');
+                },
+
+                cacheDom() {
+                    this.dom = {
+                        langButtons: document.querySelectorAll('.lang-selector button'),
+                        fullName: document.getElementById('fullName'),
+                        birthDay: document.getElementById('birthDay'),
+                        birthMonth: document.getElementById('birthMonth'),
+                        birthYear: document.getElementById('birthYear'),
+                        genderButtons: document.querySelectorAll('.gender-toggle button'),
+                        btnStart: document.getElementById('btnStart'),
+                        btnRestart: document.getElementById('btnRestart'),
+                        formSection: document.getElementById('formSection'),
+                        resultsContainer: document.getElementById('resultsContainer'),
+                        outputWrapper: document.getElementById('outputWrapper'),
+                        appTitle: document.getElementById('appTitle'),
+                        subBrand: document.getElementById('subBrand'),
+                        infoTitle: document.getElementById('infoTitle'),
+                        infoText: document.getElementById('infoText'),
+                    };
+                    this.lang = 'sk';
+                    this.gender = 'm';
+                },
+
+                bindEvents() {
+                    this.dom.langButtons.forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            this.updateLanguage(btn.dataset.lang);
+                        });
+                    });
+
+                    this.dom.genderButtons.forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            this.dom.genderButtons.forEach(b => b.classList.remove('active'));
+                            btn.classList.add('active');
+                            this.gender = btn.dataset.gender;
+                            document.body.className = this.gender === 'f' ? 'female' : '';
+                        });
+                    });
+
+                    this.dom.btnStart.addEventListener('click', () => this.startAnalysis());
+                    this.dom.btnRestart.addEventListener('click', () => this.restart());
+                    this.dom.fullName.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') this.startAnalysis();
+                    });
+                },
+
+                populateDates() {
+                    const daySel = this.dom.birthDay;
+                    for (let i = 1; i <= 31; i++) {
+                        const opt = document.createElement('option');
+                        opt.value = i;
+                        opt.textContent = i;
+                        daySel.appendChild(opt);
+                    }
+                    const yearSel = this.dom.birthYear;
+                    const curYear = new Date().getFullYear();
+                    for (let y = curYear; y >= 1920; y--) {
+                        const opt = document.createElement('option');
+                        opt.value = y;
+                        opt.textContent = y;
+                        yearSel.appendChild(opt);
+                    }
+                },
+
+                updateLanguage(lang) {
+                    this.lang = lang;
+                    const t = LANG[lang];
+                    if (!t) return;
+
+                    this.dom.langButtons.forEach(btn => {
+                        btn.classList.toggle('active', btn.dataset.lang === lang);
+                    });
+
+                    this.dom.appTitle.textContent = t.title;
+                    this.dom.subBrand.textContent = t.brand;
+                    this.dom.infoTitle.textContent = t.infoTitle;
+                    this.dom.infoText.textContent = t.infoText;
+                    document.getElementById('lblName').textContent = t.name;
+                    this.dom.fullName.placeholder = t.namePlaceholder;
+                    document.getElementById('lblBirth').textContent = t.birth;
+                    document.getElementById('lblGender').textContent = t.gender;
+                    this.dom.genderButtons.forEach(btn => {
+                        if (btn.dataset.gender === 'm') btn.textContent = t.male;
+                        else btn.textContent = t.female;
+                    });
+                    this.dom.btnStart.textContent = t.start;
+                    this.dom.btnRestart.textContent = t.restart;
+                },
+
+                startAnalysis() {
+                    const name = this.dom.fullName.value.trim();
+                    const day = parseInt(this.dom.birthDay.value);
+                    const month = parseInt(this.dom.birthMonth.value);
+                    const year = parseInt(this.dom.birthYear.value);
+
+                    if (!name || !day || !month || !year) {
+                        alert(LANG[this.lang].alert);
+                        return;
+                    }
+
+                    // VŠETKY VÝPOČTY
+                    const birthStr = `${year}${String(month).padStart(2, '0')}${String(day).padStart(2, '0')}`;
+                    const designStr = getAdjustedDate(year, month, day, -88);
+
+                    const lifePath = numerologySum(birthStr);
+                    const design = numerologySum(designStr);
+                    const destiny = nameToNumber(name);
+                    const soulUrge = getVowelsSum(name);
+                    const personality = getConsonantsSum(name);
+                    const personalYear = getPersonalYear(day, month, year);
+                    const personalMonth = getPersonalMonth(personalYear);
+                    const personalDay = getPersonalDay(personalYear, personalMonth);
+                    const challenge = getChallenge(day, month);
+                    const maturity = getMaturity(lifePath, destiny);
+
+                    // GENEROVANIE TEXTU
+                    const t = LANG[this.lang];
+                    const parts = t.parts;
+                    const tags = t.tags;
+
+                    const triggerText = generateTrigger(lifePath, challenge);
+                    const decodeText = generateDecode(destiny, personality);
+                    const pauseText = generatePause(soulUrge, maturity);
+                    const redirectText = generateRedirect(lifePath, destiny);
+                    const compassionText = generateCompassion(soulUrge, challenge);
+                    const actionText = generateAction(personalYear, personalMonth);
+                    const dailyText = generateDaily(personalDay, lifePath);
+                    const sovereignText = generateSovereign([lifePath, design, destiny, soulUrge, personality, personalYear, personalMonth, personalDay, challenge, maturity]);
+
+                    // ZOBRAZENIE
+                    const html = `
+                        <div class="result-block">
+                            <div class="title">${parts.trigger} <span class="tag">${tags.trigger}</span></div>
+                            <p>${triggerText}</p>
+                        </div>
+                        <div class="result-block">
+                            <div class="title">${parts.decode} <span class="tag">${tags.decode}</span></div>
+                            <p>${decodeText}</p>
+                        </div>
+                        <div class="result-block">
+                            <div class="title">${parts.pause} <span class="tag">${tags.pause}</span></div>
+                            <p>${pauseText}</p>
+                        </div>
+                        <div class="result-block">
+                            <div class="title">${parts.redirect} <span class="tag">${tags.redirect}</span></div>
+                            <p>${redirectText}</p>
+                        </div>
+                        <div class="result-block">
+                            <div class="title">${parts.compassion} <span class="tag">${tags.compassion}</span></div>
+                            <p>${compassionText}</p>
+                        </div>
+                        <div class="result-block">
+                            <div class="title">${parts.action} <span class="tag">${tags.action}</span></div>
+                            <p>${actionText}</p>
+                        </div>
+                        <div class="result-block">
+                            <div class="title">${parts.daily} <span class="tag">${tags.daily}</span></div>
+                            <p>${dailyText}</p>
+                        </div>
+                        <div class="result-block">
+                            <div class="title">${parts.sovereign} <span class="tag">${tags.sovereign}</span></div>
+                            <p style="white-space:pre-line;">${sovereignText}</p>
+                        </div>
+                    `;
+
+                    this.dom.outputWrapper.innerHTML = html;
+                    this.dom.formSection.style.display = 'none';
+                    this.dom.resultsContainer.classList.add('active');
+                    this.dom.resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                },
+
+                restart() {
+                    this.dom.resultsContainer.classList.remove('active');
+                    this.dom.formSection.style.display = 'block';
+                    this.dom.outputWrapper.innerHTML = '';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            };
+
+            document.addEventListener('DOMContentLoaded', () => app.init());
+            window.app = app;
+        })();
+    </script>
+</body>
+</html>

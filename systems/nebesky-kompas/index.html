@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nebeský kompas · The Human Maintenance</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #040810; --card: #0a1420; --border: #1a2a3a; --text: #d0e0e8;
+            --muted: #5a7a8a; --accent1: #f0c080; --accent2: #6aa0c0; --accent3: #a78bfa;
+            --radius: 18px;
+        }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+        body.female {
+            --accent1: #f472b6;
+            --accent2: #a78bfa;
+            --accent3: #f59e0b;
+        }
+        .app {
+            max-width: 860px;
+            width: 100%;
+            background: var(--card);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 28px 24px 20px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.9);
+            position: relative;
+            overflow: hidden;
+        }
+        .app::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(240,192,128,0.02), transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(106,160,192,0.02), transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(167,139,250,0.01), transparent 60%);
+            pointer-events: none;
+        }
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            animation: twinkle 3s infinite alternate;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.1; }
+            100% { opacity: 0.8; }
+        }
+
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; position: relative; z-index: 1; }
+        .logo h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: 2px; background: linear-gradient(135deg, var(--accent1), var(--accent2), var(--accent3)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .logo span { display: block; font-size: 0.6rem; font-weight: 400; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; -webkit-text-fill-color: var(--muted); }
+        .lang-selector { display: flex; gap: 3px; background: rgba(255,255,255,0.04); border-radius: 30px; padding: 3px; border: 1px solid var(--border); z-index: 2; position: relative; }
+        .lang-selector button { background: transparent; border: none; color: var(--muted); padding: 4px 10px; border-radius: 30px; font-size: 0.65rem; font-weight: 700; cursor: pointer; transition: 0.25s; text-transform: uppercase; }
+        .lang-selector button.active { background: var(--accent1); color: #000; box-shadow: 0 0 20px rgba(240,192,128,0.2); }
+        .info-box { background: linear-gradient(135deg, rgba(167,139,250,0.05), var(--card)); border: 1px solid var(--border); border-left: 4px solid var(--accent3); border-radius: 14px; padding: 14px 18px; margin-bottom: 16px; color: #c0d0d8; font-size: 0.85rem; line-height: 1.7; position: relative; z-index: 1; }
+        .info-box strong { color: var(--accent3); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 2px; font-size: 0.7rem; }
+        .form-section { margin-bottom: 6px; position: relative; z-index: 1; }
+        .form-section.hidden { display: none; }
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; font-size: 0.55rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 4px; font-weight: 600; }
+        .form-group input { width: 100%; padding: 12px 14px; background: #080e1a; border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: 0.95rem; transition: 0.3s; outline: none; }
+        .form-group input:focus { border-color: var(--accent1); box-shadow: 0 0 0 3px rgba(240,192,128,0.1); }
+        .form-group input::placeholder { color: var(--muted); opacity: 0.4; }
+        .date-row { display: grid; grid-template-columns: 1fr 1fr 1.4fr; gap: 8px; }
+        .date-row select { padding: 11px 8px; background: #080e1a; border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-size: 0.9rem; outline: none; transition: 0.3s; appearance: none; -webkit-appearance: none; cursor: pointer; }
+        .date-row select:focus { border-color: var(--accent1); box-shadow: 0 0 0 3px rgba(240,192,128,0.1); }
+        .gender-toggle { display: flex; gap: 8px; background: #080e1a; border-radius: 12px; padding: 3px; border: 1px solid var(--border); margin-top: 4px; }
+        .gender-toggle button { flex: 1; padding: 8px 0; border: none; background: transparent; color: var(--muted); font-size: 0.8rem; font-weight: 600; border-radius: 10px; cursor: pointer; transition: 0.25s; }
+        .gender-toggle button.active { background: var(--accent1); color: #000; box-shadow: 0 0 20px rgba(240,192,128,0.2); }
+        .btn-primary { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--accent1), var(--accent2)); border: none; border-radius: 12px; color: #000; font-size: 1rem; font-weight: 700; letter-spacing: 1.5px; cursor: pointer; transition: 0.3s; text-transform: uppercase; margin-top: 6px; box-shadow: 0 0 30px rgba(240,192,128,0.1); position: relative; z-index: 1; }
+        .btn-primary:hover { transform: scale(1.01); box-shadow: 0 0 50px rgba(240,192,128,0.2); }
+        .results-container { display: none; margin-top: 10px; }
+        .results-container.active { display: block; animation: fadeIn 0.6s ease; }
+        @keyframes fadeIn { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+        .result-block { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 14px; padding: 18px 18px; margin-bottom: 14px; transition: 0.3s; border-left: 3px solid var(--accent3); position: relative; z-index: 1; }
+        .result-block .title { font-size: 0.75rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent1); margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
+        .result-block .title .tag { font-size: 0.5rem; color: var(--muted); background: rgba(255,255,255,0.04); padding: 2px 10px; border-radius: 30px; border: 1px solid var(--border); }
+        .result-block .emotion-name { font-size: 0.95rem; font-weight: 700; color: var(--accent1); }
+        .result-block .desc { font-size: 0.88rem; line-height: 1.7; color: #c0d0d8; margin: 4px 0; }
+        .result-block .detail { font-size: 0.82rem; color: var(--muted); margin: 2px 0; padding-left: 10px; border-left: 2px solid var(--border); }
+        .result-block .detail strong { color: var(--accent2); }
+        .result-block .highlight-box { background: rgba(240,192,128,0.05); border: 1px solid rgba(240,192,128,0.1); border-radius: 10px; padding: 10px 14px; margin-top: 8px; }
+        .result-block .highlight-box .hl-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent1); }
+        .result-block .highlight-box .hl-value { font-size: 1.1rem; font-weight: 700; color: var(--accent1); margin-top: 2px; }
+        .result-block .highlight-box .hl-desc { font-size: 0.85rem; color: #c0d0d8; margin-top: 4px; }
+        .btn-restart { display: block; width: 100%; padding: 12px; background: transparent; border: 1px solid var(--border); border-radius: 12px; color: var(--muted); font-size: 0.8rem; cursor: pointer; transition: 0.3s; text-align: center; margin-top: 8px; position: relative; z-index: 1; }
+        .btn-restart:hover { border-color: var(--accent1); color: #fff; }
+        .footer { margin-top: 24px; padding-top: 12px; border-top: 1px solid var(--border); text-align: center; font-size: 0.55rem; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; position: relative; z-index: 1; }
+        .footer strong { color: var(--accent1); font-weight: 600; }
+        .seal-badge { display: inline-block; background: rgba(240,192,128,0.1); border: 1px solid var(--accent1); border-radius: 50%; width: 56px; height: 56px; line-height: 56px; text-align: center; font-size: 1.6rem; font-weight: 700; color: var(--accent1); margin: 4px 0; }
+        @media (max-width:480px) { .app { padding: 16px 12px 14px; } .logo h1 { font-size: 1.4rem; } .result-block { padding: 14px 12px; } .result-block .desc { font-size: 0.82rem; } .date-row { grid-template-columns: 1fr 1fr 1.2fr; gap: 4px; } .date-row select { padding: 10px 4px; font-size: 0.85rem; } .header { flex-direction: column; align-items: stretch; } .seal-badge { width: 44px; height: 44px; line-height: 44px; font-size: 1.2rem; } }
+        .glow-text { color: var(--accent1); font-weight: 600; }
+    </style>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/variables.css">
+    <link rel="stylesheet" href="../../css/base.css">
+    <link rel="icon" href="../../images/logo-projektu.png">
+</head>
+<body class="hm-grid-bg">
+<div class="hm-topbar">
+    <a class="hm-back" href="../../index.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        Späť do centra
+    </a>
+    <span class="hm-system-tag">Nebeský kompas</span>
+</div>
+
+<div class="app" id="app">
+    <div class="stars" id="stars"></div>
+    <div class="header">
+        <div class="logo"><h1 id="appTitle">Nebeský kompas</h1><span id="subBrand">The Human Maintenance · Nebeská navigácia</span></div>
+        <div class="lang-selector" id="langSelector">
+            <button class="active" data-lang="sk">SK</button>
+            <button data-lang="en">EN</button>
+            <button data-lang="de">DE</button>
+            <button data-lang="cz">CZ</button>
+        </div>
+    </div>
+    <div class="info-box"><strong>🌌 TVOJ KĽÚČ K NEBESKÉMU PORIADKU</strong><p id="infoText">Tvoja duša je zapísaná v hviezdach. Tvoj dátum narodenia a meno sú tvojím kľúčom k nebeskému poriadku. Nebeský kompas ti ukáže tvoju jedinečnú nebeskú signatúru – súhvezdie tvojej duše, tvojho strážcu, tvoj dar a tvoju výzvu. Žiadne čísla bez významu. Len čisté poznanie.</p></div>
+    <div class="form-section" id="formSection">
+        <div class="form-group"><label id="lblName">Celé meno a priezvisko</label><input type="text" id="fullName" placeholder="napr. Július Kováč"></div>
+        <div class="form-group">
+            <label id="lblBirth">Dátum narodenia</label>
+            <div class="date-row">
+                <select id="birthDay"><option value="" id="optDay">Deň</option></select>
+                <select id="birthMonth"><option value="" id="optMonth">Mesiac</option>
+                    <option value="1">Január</option><option value="2">Február</option><option value="3">Marec</option><option value="4">Apríl</option><option value="5">Máj</option><option value="6">Jún</option><option value="7">Júl</option><option value="8">August</option><option value="9">September</option><option value="10">Október</option><option value="11">November</option><option value="12">December</option>
+                </select>
+                <select id="birthYear"><option value="" id="optYear">Rok</option></select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label id="lblGender">Polarita</label>
+            <div class="gender-toggle" id="genderToggle">
+                <button class="active" data-gender="m">⚡ Muž</button>
+                <button data-gender="f">🌸 Žena</button>
+            </div>
+        </div>
+        <button class="btn-primary" id="btnStart">✦ Otvoriť nebeský kompas</button>
+    </div>
+    <div class="results-container" id="resultsContainer"><div id="outputWrapper"></div><button class="btn-restart" id="btnRestart">↺ Nový výpočet</button></div>
+    <div class="footer"><strong>Grizzly Courage</strong> · The Human Maintenance</div>
+</div>
+
+<script>
+(function(){
+    'use strict';
+
+    // ================================================================
+    // 1. JAZYKY
+    // ================================================================
+    const LANG = {
+        sk: {
+            title: 'Nebeský kompas',
+            brand: 'The Human Maintenance · Nebeská navigácia',
+            info: 'Tvoja duša je zapísaná v hviezdach. Tvoj dátum narodenia a meno sú tvojím kľúčom k nebeskému poriadku. Nebeský kompas ti ukáže tvoju jedinečnú nebeskú signatúru – súhvezdie tvojej duše, tvojho strážcu, tvoj dar a tvoju výzvu.',
+            name: 'Celé meno a priezvisko',
+            namePlaceholder: 'napr. Július Kováč',
+            birth: 'Dátum narodenia',
+            optDay: 'Deň',
+            optMonth: 'Mesiac',
+            optYear: 'Rok',
+            gender: 'Polarita',
+            male: '⚡ Muž',
+            female: '🌸 Žena',
+            start: '✦ Otvoriť nebeský kompas',
+            restart: '↺ Nový výpočet',
+            alert: 'Prosím, vyplň meno a dátum narodenia.',
+            labels: {
+                signature: '🌌 Tvoja nebeská signatúra',
+                seal: '✦ Tvoja nebeská pečať',
+                constellation: '⭐ Tvoje súhvezdie duše',
+                guardian: '👼 Tvoj strážca',
+                challenge: '🔥 Tvoja výzva',
+                gift: '🎁 Tvoj dar',
+                message: '📜 Nebeský odkaz',
+                calendar: '📅 Nebeský kalendár'
+            }
+        },
+        en: {
+            title: 'Celestial Compass',
+            brand: 'The Human Maintenance · Celestial Navigation',
+            info: 'Your soul is written in the stars. Your birth date and name are your key to the celestial order. The Celestial Compass shows your unique celestial signature – your soul constellation, your guardian, your gift, and your challenge.',
+            name: 'Full Name',
+            namePlaceholder: 'e.g. John Doe',
+            birth: 'Date of Birth',
+            optDay: 'Day',
+            optMonth: 'Month',
+            optYear: 'Year',
+            gender: 'Polarity',
+            male: '⚡ Male',
+            female: '🌸 Female',
+            start: '✦ Open Celestial Compass',
+            restart: '↺ New Calculation',
+            alert: 'Please fill in your name and date of birth.',
+            labels: {
+                signature: '🌌 Your Celestial Signature',
+                seal: '✦ Your Celestial Seal',
+                constellation: '⭐ Your Soul Constellation',
+                guardian: '👼 Your Guardian',
+                challenge: '🔥 Your Challenge',
+                gift: '🎁 Your Gift',
+                message: '📜 Celestial Message',
+                calendar: '📅 Celestial Calendar'
+            }
+        },
+        de: {
+            title: 'Himmelskompass',
+            brand: 'The Human Maintenance · Himmlische Navigation',
+            info: 'Deine Seele ist in den Sternen geschrieben. Dein Geburtsdatum und Name sind dein Schlüssel zur himmlischen Ordnung. Der Himmelskompass zeigt deine einzigartige himmlische Signatur – dein Seelensternbild, deinen Wächter, deine Gabe und deine Herausforderung.',
+            name: 'Vollständiger Name',
+            namePlaceholder: 'z.B. Julius Kováč',
+            birth: 'Geburtsdatum',
+            optDay: 'Tag',
+            optMonth: 'Monat',
+            optYear: 'Jahr',
+            gender: 'Polarität',
+            male: '⚡ Männlich',
+            female: '🌸 Weiblich',
+            start: '✦ Himmelskompass öffnen',
+            restart: '↺ Neue Berechnung',
+            alert: 'Bitte geben Sie Namen und Geburtsdatum ein.',
+            labels: {
+                signature: '🌌 Deine himmlische Signatur',
+                seal: '✦ Dein himmlisches Siegel',
+                constellation: '⭐ Dein Seelensternbild',
+                guardian: '👼 Dein Wächter',
+                challenge: '🔥 Deine Herausforderung',
+                gift: '🎁 Deine Gabe',
+                message: '📜 Himmlische Botschaft',
+                calendar: '📅 Himmlischer Kalender'
+            }
+        },
+        cz: {
+            title: 'Nebeský kompas',
+            brand: 'The Human Maintenance · Nebeská navigace',
+            info: 'Tvá duše je zapsána v hvězdách. Tvé datum narození a jméno jsou tvým klíčem k nebeskému řádu. Nebeský kompas ukáže tvou jedinečnou nebeskou signaturu – souhvězdí tvé duše, tvého strážce, tvůj dar a tvou výzvu.',
+            name: 'Celé jméno a příjmení',
+            namePlaceholder: 'např. Julius Kováč',
+            birth: 'Datum narození',
+            optDay: 'Den',
+            optMonth: 'Měsíc',
+            optYear: 'Rok',
+            gender: 'Polarita',
+            male: '⚡ Muž',
+            female: '🌸 Žena',
+            start: '✦ Otevřít nebeský kompas',
+            restart: '↺ Nový výpočet',
+            alert: 'Prosím, vyplň jméno a datum narození.',
+            labels: {
+                signature: '🌌 Tvá nebeská signatura',
+                seal: '✦ Tvá nebeská pečeť',
+                constellation: '⭐ Tvé souhvězdí duše',
+                guardian: '👼 Tvůj strážce',
+                challenge: '🔥 Tvá výzva',
+                gift: '🎁 Tvůj dar',
+                message: '📜 Nebeský odkaz',
+                calendar: '📅 Nebeský kalendář'
+            }
+        }
+    };
+
+    let currentLang = 'sk';
+    let currentGender = 'm';
+
+    // ================================================================
+    // 2. NUMEROLOGICKÉ FUNKCIE
+    // ================================================================
+    function numerologySum(str) {
+        let sum = 0;
+        for (let ch of str) { let d = parseInt(ch); if (!isNaN(d)) sum += d; }
+        while (sum > 9 && sum !== 11 && sum !== 22 && sum !== 33) {
+            sum = String(sum).split('').reduce((a,b) => parseInt(a)+parseInt(b),0);
+        }
+        return sum;
+    }
+
+    function nameToNumber(name) {
+        const map = {'a':1,'á':1,'ä':1,'b':2,'c':3,'č':3,'d':4,'ď':4,'e':5,'é':5,'ě':5,
+            'f':6,'g':7,'h':8,'ch':8,'i':9,'í':9,'j':1,'k':2,'l':3,'m':4,'n':5,
+            'ň':5,'o':6,'ó':6,'ô':6,'p':7,'q':8,'r':9,'ř':9,'s':1,'š':1,'t':2,
+            'ť':2,'u':3,'ú':3,'ů':3,'v':4,'w':5,'x':6,'y':7,'ý':7,'z':8,'ž':8};
+        let clean = name.toLowerCase().replace(/[^a-záäčďéěíňóôřšťúůýž]/g,'');
+        let sum = 0;
+        for (let ch of clean) { if (map[ch]) sum += map[ch]; }
+        while (sum > 9 && sum !== 11 && sum !== 22 && sum !== 33) {
+            sum = String(sum).split('').reduce((a,b) => parseInt(a)+parseInt(b),0);
+        }
+        return sum;
+    }
+
+    function getVowelsSum(name) {
+        const vowels = 'aeiouyáäéíóôúý';
+        let sum = 0;
+        let clean = name.toLowerCase().replace(/[^a-záäčďéěíňóôřšťúůýž]/g,'');
+        for (let ch of clean) {
+            if (vowels.includes(ch)) {
+                const map = {'a':1,'á':1,'ä':1,'e':5,'é':5,'ě':5,'i':9,'í':9,'o':6,'ó':6,'ô':6,'u':3,'ú':3,'ů':3,'y':7,'ý':7};
+                sum += map[ch] || 0;
+            }
+        }
+        while (sum > 9 && sum !== 11 && sum !== 22 && sum !== 33) {
+            sum = String(sum).split('').reduce((a,b) => parseInt(a)+parseInt(b),0);
+        }
+        return sum;
+    }
+
+    function getConsonantsSum(name) {
+        const vowels = 'aeiouyáäéíóôúý';
+        let sum = 0;
+        let clean = name.toLowerCase().replace(/[^a-záäčďéěíňóôřšťúůýž]/g,'');
+        for (let ch of clean) {
+            if (!vowels.includes(ch)) {
+                const map = {'b':2,'c':3,'č':3,'d':4,'ď':4,'f':6,'g':7,'h':8,'ch':8,'j':1,'k':2,'l':3,'m':4,'n':5,'ň':5,'p':7,'q':8,'r':9,'ř':9,'s':1,'š':1,'t':2,'ť':2,'v':4,'w':5,'x':6,'z':8,'ž':8};
+                sum += map[ch] || 0;
+            }
+        }
+        while (sum > 9 && sum !== 11 && sum !== 22 && sum !== 33) {
+            sum = String(sum).split('').reduce((a,b) => parseInt(a)+parseInt(b),0);
+        }
+        return sum;
+    }
+
+    function getAdjustedDate(year, month, day, daysOffset) {
+        const d = new Date(year, month - 1, day);
+        d.setDate(d.getDate() + daysOffset);
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${y}${m}${dd}`;
+    }
+
+    function getBirthdayNumber(day) { return numerologySum(String(day)); }
+    function getChallenge(day, month) { return numerologySum(String(Math.abs(day - month))); }
+    function getMaturity(lifePath, destiny) { return numerologySum(String(lifePath + destiny)); }
+    function getSubconsciousSelf(name) { return getConsonantsSum(name); }
+    function getKarmicDebt(number) {
+        const debts = [13,14,16,19];
+        let debt = null;
+        if (number === 13 || number === 14 || number === 16 || number === 19) debt = number;
+        if (!debt) {
+            let temp = number;
+            while (temp > 9 && temp !== 11 && temp !== 22 && temp !== 33) {
+                const s = String(temp);
+                if (s.length === 2) {
+                    const a = parseInt(s[0]), b = parseInt(s[1]);
+                    const sum = a + b;
+                    if (sum === 13 || sum === 14 || sum === 16 || sum === 19) { debt = sum; break; }
+                    temp = sum;
+                } else break;
+            }
+        }
+        return debt;
+    }
+
+    function getPersonalYear(day, month, year) {
+        const curYear = new Date().getFullYear();
+        return numerologySum(String(day) + String(month) + String(curYear));
+    }
+
+    // ================================================================
+    // 3. NEBESKÉ DATABÁZY
+    // ================================================================
+
+    // 12 súhvezdí + 12 ďalších (24 celkom)
+    const CONSTELLATIONS = [
+        { name: 'Andromeda', desc: 'Si ako princezná pripútaná k skale – slobodná, ale obmedzená. Tvoja cesta je o oslobodení sa od minulosti a o tom, že si dovolíš byť zachránená – aj sama sebou.', shadow: 'Občas sa cítiš obeťou okolností, aj keď máš moc ich zmeniť.' },
+        { name: 'Cassiopeia', desc: 'Si kráľovná na tróne. Nečakáš, kým sa ti niečo stane – ty si tvoríš svoj vlastný osud. Tvoja sila je v tom, že vieš, čo chceš, a nejdeš za tým agresívne, ale s noblesou a vnútornou istotou.', shadow: 'Občas sa môžeš zdať neprístupný alebo chladný – ale pod tým je obrovská citlivosť.' },
+        { name: 'Orion', desc: 'Si lovec. Tvoja cesta je o hľadaní a objavovaní. Nebojíš sa tmy, práve naopak – si v nej ako doma. Tvoja sila je v tom, že vidíš veci, ktoré ostatní prehliadajú.', shadow: 'Tvoja potreba byť nezávislý ťa občas izoluje od ostatných.' },
+        { name: 'Pegasus', desc: 'Si okrídlený kôň. Tvoja duša túži po slobode a tvorivosti. Nesieš v sebe inšpiráciu, ktorá môže zmeniť svet – ale musíš sa naučiť pristáť a byť prítomný.', shadow: 'Občas unikáš do snov a ideálov, namiesto toho, aby si čelil realite.' },
+        { name: 'Lyra', desc: 'Si lýra – nástroj, ktorý prináša harmóniu. Tvoj dar je v tom, že dokážeš upokojiť búrky okolo seba. Tvoja prítomnosť je liečivá – keď sa rozhodneš byť prítomný.', shadow: 'Tvoja citlivosť ťa občas robí zraniteľným a uzatváraš sa do seba.' },
+        { name: 'Draco', desc: 'Si strážca pokladov. Tvoja cesta je o ochrane toho, čo je cenné – nielen materiálne, ale aj duchovné. Tvoja sila je v tvojej vytrvalosti a oddanosti.', shadow: 'Tvoja potreba chrániť sa občas mení na kontrolu a nedôveru.' },
+        { name: 'Hercules', desc: 'Si hrdina. Tvoja cesta je o prekonávaní prekážok a napĺňaní svojho osudu. Tvoja sila je v tvojej odvahe a sile – ale aj v tom, že sa nebojíš požiadať o pomoc.', shadow: 'Občas sa cítiš, že všetko musíš zvládnuť sám – a to ťa vyčerpáva.' },
+        { name: 'Aquila', desc: 'Si orol. Tvoj pohľad siaha ďaleko, vidíš súvislosti, ktoré ostatní prehliadajú. Tvoja cesta je o tom, aby si svoju jasnosť použil na dobro – nie na kritiku.', shadow: 'Tvoja bystrosť sa občas mení na cynizmus a odstup.' },
+        { name: 'Cygnus', desc: 'Si labuť. Tvoja krása je v tvojej jemnosti a elegancii. Nenesieš sa ťažkopádne – ľahko prechádzaš životom. Tvoja cesta je o tom, aby si sa naučil prijímať komplimenty a lásku.', shadow: 'Občas sa skrývaš pred svetom, aby si nemusel čeliť jeho drsnosti.' },
+        { name: 'Perseus', desc: 'Si bojovník, ktorý prekonáva nemožné. Tvoja cesta je o tom, aby si čelil svojim démonom – a vyhral. Tvoja sila je v tom, že sa nevzdávaš.', shadow: 'Tvoja vytrvalosť sa občas mení na tvrdohlavosť a slepú snahu.' },
+        { name: 'Ursa Major', desc: 'Si veľký medveď – sila a ochrana. Tvoja cesta je o tom, aby si chránil tých, ktorých miluješ, a zároveň si dovolil byť chránený. Tvoja sila je v tvojej stabilite.', shadow: 'Tvoja ochranárska povaha ťa občas robí prehnane starostlivým.' },
+        { name: 'Leo', desc: 'Si lev – kráľ zvierat. Tvoja cesta je o vedení a inšpirácii. Tvoja sila je v tom, že si prirodzený vodca – ale musíš sa naučiť viesť aj seba.', shadow: 'Tvoja potreba byť v strede pozornosti ťa občas robí povrchným.' },
+        { name: 'Virgo', desc: 'Si panna – čistota a služba. Tvoja cesta je o tom, aby si slúžil druhým bez straty seba. Tvoja sila je v tvojej obetavosti a čistote úmyslov.', shadow: 'Tvoja snaha o dokonalosť ťa občas robí príliš kritickým voči sebe.' },
+        { name: 'Libra', desc: 'Si váhy – rovnováha a spravodlivosť. Tvoja cesta je o hľadaní harmónie vo vzťahoch aj v sebe. Tvoja sila je v tvojom zmysle pre spravodlivosť.', shadow: 'Tvoja túžba po harmónii ťa občas robí nerozhodným a závislým na názoroch iných.' },
+        { name: 'Scorpio', desc: 'Si škorpión – intenzita a transformácia. Tvoja cesta je o hlbokých premenách a pochopení tajomstiev života. Tvoja sila je v tvojej hĺbke a vášni.', shadow: 'Tvoja intenzita ťa občas robí tajnostkárskym a nedôverčivým.' },
+        { name: 'Sagittarius', desc: 'Si strelec – hľadanie a objavovanie. Tvoja cesta je o cestovaní – nielen fyzickom, ale aj duchovnom. Tvoja sila je v tvojej zvedavosti a optimizme.', shadow: 'Tvoja túžba po slobode ťa občas robí nezodpovedným a nestálym.' },
+        { name: 'Capricorn', desc: 'Si kozorožec – ambícia a vytrvalosť. Tvoja cesta je o dosahovaní vrcholov – ale musíš sa naučiť užívať si cestu, nielen cieľ.', shadow: 'Tvoja ambicióznosť ťa občas robí prácne závislým a chladným.' },
+        { name: 'Aquarius', desc: 'Si vodnár – originalita a vízia. Tvoja cesta je o prinášaní nových myšlienok do sveta. Tvoja sila je v tvojej nezávislosti a schopnosti vidieť budúcnosť.', shadow: 'Tvoja originalita ťa občas robí excentrickým a nepochopeným.' },
+        { name: 'Pisces', desc: 'Si ryba – citlivosť a hĺbka. Tvoja cesta je o prepojení s duchovným svetom. Tvoja sila je v tvojej empatii a kreativite.', shadow: 'Tvoja citlivosť ťa občas robí príliš emocionálnym a utekáš do fantázie.' },
+        { name: 'Aries', desc: 'Si baran – odvaha a iniciatíva. Tvoja cesta je o začatí nových vecí. Tvoja sila je v tom, že sa nebojíš ísť prvý.', shadow: 'Tvoja impulzívnosť ťa občas robí netrpezlivým a agresívnym.' },
+        { name: 'Taurus', desc: 'Si býk – stabilita a vytrvalosť. Tvoja cesta je o budovaní pevných základov. Tvoja sila je v tvojej spoľahlivosti a trpezlivosti.', shadow: 'Tvoja tvrdohlavosť ťa občas robí nepružným a uzavretým voči zmene.' },
+        { name: 'Gemini', desc: 'Si dvojičky – komunikácia a zvedavosť. Tvoja cesta je o spájaní zdanlivo nesúvisiacich vecí. Tvoja sila je v tvojej flexibilite a inteligencii.', shadow: 'Tvoja neustála zmena nálad ťa občas robí nespoľahlivým.' },
+        { name: 'Cancer', desc: 'Si rak – starostlivosť a rodina. Tvoja cesta je o ochrane a výžive. Tvoja sila je v tvojej empatii a láske.', shadow: 'Tvoja prehnaná starostlivosť ťa občas robí prehnane ochranárskym.' },
+        { name: 'Ophiuchus', desc: 'Si hadia nosič – liečiteľ a transformátor. Tvoja cesta je o liečení a prekonávaní vlastných tieňov. Tvoja sila je v tvojej schopnosti uzdravovať.', shadow: 'Tvoja potreba liečiť iných ťa občas robí zabúdajúcim na seba.' }
+    ];
+
+    // 10 archanjelov (strážcov)
+    const GUARDIANS = {
+        1: { name: 'Michael', desc: 'Archanjel ochrany a sily. Tvoj dar je odvaha a schopnosť stáť si za svojím. Tvoja výzva je naučiť sa, že sila nie je v ovládaní, ale v ochrane.', sign: 'Si tu preto, aby si chránil slabších a prinášal svetlo do temnoty.' },
+        2: { name: 'Gabriel', desc: 'Archanjel posolstva a zjavení. Tvoj dar je komunikácia a schopnosť počuť jemné hlasy. Tvoja výzva je naučiť sa, že nie všetky správy sú určené tebe – niekedy si len posol.', sign: 'Si tu preto, aby si prinášal posolstvá, ktoré menia životy.' },
+        3: { name: 'Raphael', desc: 'Archanjel liečenia. Tvoj dar je uzdravovať – seba aj iných. Tvoja výzva je naučiť sa, že aj liečiteľ potrebuje liečenie.', sign: 'Si tu preto, aby si prinášal uzdravenie tam, kde je bolesť.' },
+        4: { name: 'Uriel', desc: 'Archanjel múdrosti a osvietenia. Tvoj dar je vidieť pravdu, aj keď je skrytá. Tvoja výzva je naučiť sa, že nie všetka pravda sa dá vysloviť – niekedy ju treba len žiť.', sign: 'Si tu preto, aby si prinášal svetlo do najtemnejších miest.' },
+        5: { name: 'Raguel', desc: 'Archanjel spravodlivosti a rovnováhy. Tvoj dar je vidieť nespravodlivosť a vedieť, čo je správne. Tvoja výzva je nebyť príliš tvrdý na seba ani na iných.', sign: 'Si tu preto, aby si udržiaval rovnováhu vo svete.' },
+        6: { name: 'Sariel', desc: 'Archanjel vedenia a stráženia duší. Tvoj dar je vnímať duchovné dimenzie a viesť iných. Tvoja výzva je naučiť sa, že nie každý chce byť vedený – niekedy treba len byť.', sign: 'Si tu preto, aby si sprevádzal duše na ich ceste.' },
+        7: { name: 'Remiel', desc: 'Archanjel nádeje a vzkriesenia. Tvoj dar je prinášať nádej tam, kde je beznádej. Tvoja výzva je naučiť sa, že aj ty si zaslúžiš nádej.', sign: 'Si tu preto, aby si prinášal nový život tam, kde je koniec.' },
+        8: { name: 'Zadkiel', desc: 'Archanjel milosrdenstva a odpustenia. Tvoj dar je odpúšťať – sebe aj iným. Tvoja výzva je naučiť sa, že odpustenie nie je slabosť, ale najvyššia sila.', sign: 'Si tu preto, aby si učil ľudí odpúšťať.' },
+        9: { name: 'Haniel', desc: 'Archanjel krásy a radosti. Tvoj dar je vidieť krásu vo všetkom. Tvoja výzva je naučiť sa, že krása nie je povrchná – je to prejav božského poriadku.', sign: 'Si tu preto, aby si prinášal radosť a krásu do sveta.' }
+    };
+
+    // Výzvy (1-9)
+    const CHALLENGES = {
+        1: 'Naučiť sa, že nie si stredobodom sveta. Tvoja sila je v spolupráci, nie v samote.',
+        2: 'Naučiť sa, že aj tvoj hlas má váhu. Nie je to ego – je to tvoja pravda.',
+        3: 'Naučiť sa, že radosť nie je povinnosť. Je to dar – a môžeš ho prijať aj bez masky.',
+        4: 'Naučiť sa, že chaos nie je nepriateľ. Je to priestor pre nové.',
+        5: 'Naučiť sa, že sloboda nie je v úteku. Je v prijatí.',
+        6: 'Naučiť sa, že láska začína pri tebe. Nie je to sebectvo – je to nutnosť.',
+        7: 'Naučiť sa, že nie všetko sa dá pochopiť. A to je v poriadku.',
+        8: 'Naučiť sa, že tvoja hodnota nie je v tom, čo dokážeš. Je v tom, kto si.',
+        9: 'Naučiť sa, že aj ty potrebuješ pomoc. Nie je to slabosť – je to ľudskosť.'
+    };
+
+    // Dary (1-9)
+    const GIFTS = {
+        1: 'Dar nezávislosti – vieš stáť sám za seba. Tvoja sila je v tom, že nepotrebuješ nikoho, aby si bol celistvý.',
+        2: 'Dar citlivosti – vnímaš veci, ktoré ostatní prehliadajú. Tvoja sila je v jemnosti a porozumení.',
+        3: 'Dar kreativity – tvoríš nové svety myšlienkami. Tvoja sila je v tom, že vieš inšpirovať druhých.',
+        4: 'Dar disciplíny – vieš, že tvrdá práca prináša ovocie. Tvoja sila je vo vytrvalosti.',
+        5: 'Dar slobody – si slobodný duch, ktorý neznáša obmedzenia. Tvoja sila je v odvahe žiť podľa svojich pravidiel.',
+        6: 'Dar starostlivosti – tvoja láska a empatia liečia tých, ktorí sú okolo teba. Tvoja sila je v tvojom srdci.',
+        7: 'Dar múdrosti – vidíš hlbšie súvislosti, ktoré ostatní nevidia. Tvoja sila je v tvojej introspekcii.',
+        8: 'Dar sily – si nezlomný. Tvoja sila je v tom, že sa nikdy nevzdávaš.',
+        9: 'Dar súcitu – vidíš bolesť sveta a chceš ju liečiť. Tvoja sila je v tvojej empatii.'
+    };
+
+    // Nebeské odkazy (1-9)
+    const MESSAGES = {
+        1: 'Tvoja cesta nie je o tom, čo dosiahneš – ale o tom, kým sa pri tom staneš.',
+        2: 'Nie je hanba požiadať o pomoc. Aj najväčší hrdinovia mali svojich spojencov.',
+        3: 'Radosť nie je niečo, čo hľadáš – je to niečo, čo vytváraš svojou prítomnosťou.',
+        4: 'Každý krok, aj ten najmenší, ťa posúva k tvojmu cieľu. Nevzdávaj sa.',
+        5: 'Sloboda nie je v tom, že nemáš čo stratiť – ale v tom, že máš čo žiť.',
+        6: 'Láska nie je o tom, čo dávaš – ale o tom, čím sa stávaš, keď dávaš.',
+        7: 'Nie všetko sa dá pochopiť. A to je v poriadku. Niekedy treba len dôverovať.',
+        8: 'Tvoja hodnota nie je v tvojich úspechoch. Je v tvojej bytosti.',
+        9: 'Najväčšia sila je v pokore. A najväčšia pokora je v láske.'
+    };
+
+    // Výpočet súhvezdia podľa dátumu
+    function getConstellation(day, month) {
+        // 24 súhvezdí, každé cca 15 dní
+        const idx = ((month - 1) * 30 + day) % 24;
+        return CONSTELLATIONS[idx] || CONSTELLATIONS[0];
+    }
+
+    // ================================================================
+    // 4. GENERÁTOR PROFILU
+    // ================================================================
+    function getCelestialProfile(name, day, month, year) {
+        const birthStr = `${year}${String(month).padStart(2,'0')}${String(day).padStart(2,'0')}`;
+        const designStr = getAdjustedDate(year, month, day, -88);
+
+        const lifePath = numerologySum(birthStr);
+        const design = numerologySum(designStr);
+        const destiny = nameToNumber(name);
+        const soul = getVowelsSum(name);
+        const personality = getConsonantsSum(name);
+        const birthday = getBirthdayNumber(day);
+        const challenge = getChallenge(day, month);
+        const maturity = getMaturity(lifePath, destiny);
+        const subconscious = getSubconsciousSelf(name);
+        const karmicDebt = getKarmicDebt(lifePath) || getKarmicDebt(destiny);
+
+        const personalYear = getPersonalYear(day, month, year);
+
+        // Nebeská pečať – kombinácia životnej cesty a designu
+        const sealNum = numerologySum(String(lifePath * 7 + design * 13 + personalYear));
+
+        // Súhvezdie podľa dátumu
+        const constellation = getConstellation(day, month);
+
+        // Strážca podľa životnej cesty
+        const guardian = GUARDIANS[lifePath] || GUARDIANS[1];
+
+        // Výzva podľa challenge
+        const challengeText = CHALLENGES[challenge] || CHALLENGES[1];
+
+        // Dar podľa soul (duše)
+        const gift = GIFTS[soul] || GIFTS[1];
+
+        // Odkaz podľa maturity
+        const message = MESSAGES[maturity] || MESSAGES[1];
+
+        return {
+            lifePath,
+            design,
+            sealNum,
+            constellation,
+            guardian,
+            challenge: challengeText,
+            gift,
+            message,
+            name,
+            day, month, year,
+            personalYear,
+            destiny,
+            soul,
+            personality
+        };
+    }
+
+    // ================================================================
+    // 5. ZOBRAZENIE VÝSLEDKOV
+    // ================================================================
+    function getFullOutput(name, day, month, year, gender) {
+        const profile = getCelestialProfile(name, day, month, year);
+        const t = LANG[currentLang];
+
+        const genderLabel = gender === 'm' ? 'muž' : 'žena';
+
+        return `
+            <div class="result-block" style="border-left-color: var(--accent1);">
+                <div class="title">${t.labels.signature} <span class="tag">${profile.lifePath}.${profile.design}</span></div>
+                <p class="desc">Tvoja duša je zapísaná v hviezdach. Tvoj dátum narodenia je tvoj kľúč k nebeskému poriadku.</p>
+                <div class="detail"><strong>Životná cesta:</strong> ${profile.lifePath} – tvoj základný smer</div>
+                <div class="detail"><strong>Podvedomá vrstva:</strong> ${profile.design} – tvoje vrodené vzorce</div>
+                <div class="detail"><strong>Nebeská pečať:</strong> <span class="glow-text">${profile.sealNum}</span></div>
+            </div>
+
+            <div class="result-block" style="border-left-color: var(--accent1);">
+                <div class="title">${t.labels.seal} <span class="tag">tvoj kód</span></div>
+                <div style="text-align:center;margin:4px 0;">
+                    <span class="seal-badge">${profile.sealNum}</span>
+                </div>
+                <p class="desc">Tvoja nebeská pečať je <span class="glow-text">${profile.sealNum}</span>. Je to tvoja osobná vibračná frekvencia – tvoj podpis vo vesmíre. Nie je to tvoj "osud" – je to tvoja výzva a zároveň tvoj dar.</p>
+                <div class="highlight-box">
+                    <div class="hl-label">✦ Význam pečate</div>
+                    <div class="hl-desc">Číslo ${profile.sealNum} nesie energiu ${['sily','harmónie','tvorivosti','stability','slobody','lásky','múdrosti','moci','súcitu'][(profile.sealNum-1)%9]}. V tvojom živote sa prejavuje ako ${['odvaha a nezávislosť','citlivosť a spolupráca','radosť a kreativita','disciplína a vytrvalosť','dobrodružstvo a zmena','starostlivosť a zodpovednosť','hĺbka a múdrosť','sila a ambícia','empatia a humanizmus'][(profile.sealNum-1)%9]}.</div>
+                </div>
+            </div>
+
+            <div class="result-block" style="border-left-color: var(--accent2);">
+                <div class="title">${t.labels.constellation} <span class="tag">tvoja hviezda</span></div>
+                <p class="desc"><span class="glow-text">${profile.constellation.name}</span></p>
+                <p class="desc">${profile.constellation.desc}</p>
+                <div class="detail"><strong>Tvoj tieň:</strong> ${profile.constellation.shadow}</div>
+            </div>
+
+            <div class="result-block" style="border-left-color: var(--accent3);">
+                <div class="title">${t.labels.guardian} <span class="tag">tvoj strážca</span></div>
+                <p class="desc"><span class="glow-text">${profile.guardian.name}</span></p>
+                <p class="desc">${profile.guardian.desc}</p>
+                <div class="detail"><strong>✧ Jeho posolstvo:</strong> ${profile.guardian.sign}</div>
+            </div>
+
+            <div class="result-block" style="border-left-color: #f5c842;">
+                <div class="title">${t.labels.challenge} <span class="tag">tvoja výzva</span></div>
+                <p class="desc">${profile.challenge}</p>
+            </div>
+
+            <div class="result-block" style="border-left-color: #10b981;">
+                <div class="title">${t.labels.gift} <span class="tag">tvoj dar</span></div>
+                <p class="desc">${profile.gift}</p>
+            </div>
+
+            <div class="result-block" style="border-left-color: var(--accent1); background: rgba(240,192,128,0.02);">
+                <div class="title">${t.labels.message} <span class="tag">odkaz z nebies</span></div>
+                <p class="desc" style="font-size:1.05rem;font-style:italic;color:var(--accent1);">“${profile.message}”</p>
+            </div>
+
+            <div class="result-block" style="border-left-color: var(--muted);">
+                <div class="title">${t.labels.calendar} <span class="tag">364 dní</span></div>
+                <p class="desc">Tvoj osobný deň v nebeskom kalendári je <span class="glow-text">${(profile.day + profile.month * 30) % 364}</span>. Nebeský kalendár má 364 dní – presne 52 týždňov. Je to kalendár poriadku, nie chaosu. Tvoj deň ti ukazuje, kde si v tomto cykle.</p>
+            </div>
+        `;
+    }
+
+    // ================================================================
+    // 6. APP – RIADIACA LOGIKA
+    // ================================================================
+    const app = {
+        init() {
+            this.cacheDom();
+            this.bindEvents();
+            this.populateDates();
+            this.updateLanguage('sk');
+            this.createStars();
+            document.body.className = (document.querySelector('.gender-toggle .active')?.dataset?.gender === 'f' ? 'female ' : '') + 'hm-grid-bg';
+        },
+        cacheDom() {
+            this.dom = {
+                langButtons: document.querySelectorAll('#langSelector button'),
+                fullName: document.getElementById('fullName'),
+                birthDay: document.getElementById('birthDay'),
+                birthMonth: document.getElementById('birthMonth'),
+                birthYear: document.getElementById('birthYear'),
+                genderButtons: document.querySelectorAll('.gender-toggle button'),
+                btnStart: document.getElementById('btnStart'),
+                btnRestart: document.getElementById('btnRestart'),
+                formSection: document.getElementById('formSection'),
+                resultsContainer: document.getElementById('resultsContainer'),
+                outputWrapper: document.getElementById('outputWrapper'),
+                infoText: document.getElementById('infoText'),
+                appTitle: document.getElementById('appTitle'),
+                subBrand: document.getElementById('subBrand'),
+                stars: document.getElementById('stars'),
+            };
+            this.gender = 'm';
+            this.lang = 'sk';
+        },
+        createStars() {
+            const container = this.dom.stars;
+            for (let i = 0; i < 60; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 5 + 's';
+                star.style.animationDuration = (2 + Math.random() * 3) + 's';
+                star.style.width = (1 + Math.random() * 2) + 'px';
+                star.style.height = star.style.width;
+                container.appendChild(star);
+            }
+        },
+        bindEvents() {
+            this.dom.langButtons.forEach(btn => {
+                btn.addEventListener('click', () => { this.updateLanguage(btn.dataset.lang); });
+            });
+            this.dom.genderButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    this.dom.genderButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    this.gender = btn.dataset.gender;
+                    document.body.className = (this.gender === 'f' ? 'female ' : '') + 'hm-grid-bg';
+                });
+            });
+            this.dom.btnStart.addEventListener('click', () => this.startAnalysis());
+            this.dom.btnRestart.addEventListener('click', () => this.restart());
+            this.dom.fullName.addEventListener('keydown', (e) => { if (e.key === 'Enter') this.startAnalysis(); });
+        },
+        populateDates() {
+            const daySel = this.dom.birthDay;
+            if (daySel.options.length <= 1) {
+                for (let i = 1; i <= 31; i++) { const opt = document.createElement('option'); opt.value = i; opt.textContent = i; daySel.appendChild(opt); }
+            }
+            const yearSel = this.dom.birthYear;
+            if (yearSel.options.length <= 1) {
+                const curYear = new Date().getFullYear();
+                for (let y = curYear; y >= 1920; y--) { const opt = document.createElement('option'); opt.value = y; opt.textContent = y; yearSel.appendChild(opt); }
+            }
+        },
+        updateLanguage(lang) {
+            this.lang = lang;
+            const t = LANG[lang] || LANG.sk;
+            this.dom.appTitle.textContent = t.title;
+            this.dom.subBrand.textContent = t.brand;
+            this.dom.infoText.textContent = t.info;
+            document.getElementById('lblName').textContent = t.name;
+            document.getElementById('fullName').placeholder = t.namePlaceholder;
+            document.getElementById('lblBirth').textContent = t.birth;
+            document.getElementById('optDay').textContent = t.optDay;
+            document.getElementById('optMonth').textContent = t.optMonth;
+            document.getElementById('optYear').textContent = t.optYear;
+            document.getElementById('lblGender').textContent = t.gender;
+            this.dom.genderButtons.forEach(btn => {
+                if (btn.dataset.gender === 'm') btn.textContent = t.male;
+                else btn.textContent = t.female;
+            });
+            this.dom.btnStart.textContent = t.start;
+            this.dom.btnRestart.textContent = t.restart;
+            this.dom.langButtons.forEach(btn => { btn.classList.toggle('active', btn.dataset.lang === lang); });
+        },
+        startAnalysis() {
+            const name = this.dom.fullName.value.trim();
+            const day = parseInt(this.dom.birthDay.value);
+            const month = parseInt(this.dom.birthMonth.value);
+            const year = parseInt(this.dom.birthYear.value);
+            if (!name || !day || !month || !year) { alert(LANG[this.lang].alert); return; }
+
+            const counterKey = (window.location.pathname.match(/\/systems\/([^/]+)\/index\.html$/) || [,'system'])[1] || 'system';
+            const counters = window.__HM_SYSTEM_USAGE__ || (window.__HM_SYSTEM_USAGE__ = {});
+            counters[counterKey] = (counters[counterKey] || 0) + 1;
+            const counterEl = document.getElementById('systemUsageCounter');
+            if (counterEl) counterEl.textContent = 'Počet použití: ' + counters[counterKey] + 'x';
+
+            const html = getFullOutput(name, day, month, year, this.gender);
+            this.dom.outputWrapper.innerHTML = html;
+            this.dom.formSection.style.display = 'none';
+            this.dom.resultsContainer.classList.add('active');
+
+            const targetEl = this.dom.resultsContainer;
+            const rect = targetEl.getBoundingClientRect();
+            const targetPos = rect.top + window.pageYOffset - 80;
+            window.scrollTo({ top: targetPos, behavior: 'smooth' });
+        },
+        restart() {
+            this.dom.resultsContainer.classList.remove('active');
+            this.dom.formSection.style.display = 'block';
+            this.dom.outputWrapper.innerHTML = '';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    };
+    document.addEventListener('DOMContentLoaded', () => app.init());
+    window.app = app;
+})();
+</script>
+<script src="../../js/common-systems.js"></script>
+</body>
+</html>

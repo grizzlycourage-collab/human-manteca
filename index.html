@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Human Maintenance — Centrálny systém</title>
+    <meta name="description" content="The Human Maintenance — jednotný prístup ku všetkým sebapoznávacím systémom.">
+    <link rel="icon" href="images/logo-projektu.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/hub.css">
+    <link rel="stylesheet" href="css/carousel.css">
+</head>
+<body class="hm-hub hm-grid-bg">
+
+<div class="hm-wrap">
+
+    <header class="hm-hero">
+        <div class="hm-logo-wrap">
+            <img src="images/logo-projektu.png" alt="The Human Maintenance" draggable="false"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="hm-logo-fallback" style="display:none;">HM</div>
+        </div>
+
+        <div class="hm-lang-selector" id="hmLangSelector" aria-label="Výber jazyka">
+            <button class="active" data-lang="sk" type="button">SK</button>
+            <button data-lang="en" type="button">EN</button>
+            <button data-lang="de" type="button">DE</button>
+            <button data-lang="cz" type="button">CZ</button>
+        </div>
+
+        <span class="hm-eyebrow" id="hubEyebrow">Self-diagnostic ecosystem</span>
+        <h1 id="hubTitle">The Human Maintenance</h1>
+        <p id="hubIntro">Sústava sebapoznávacích systémov na jednom mieste. Vyber si modul, prejdi diagnostikou
+           a nechaj si zobraziť svoju mapu — každý systém má vlastný výpočet, spoločné je len rozhranie.</p>
+    </header>
+
+    <section class="hm-carousel-section">
+        <div class="hm-carousel-heading" id="hubCarouselHeading">Vyber si systém</div>
+
+        <div class="hm-carousel" data-hm-carousel>
+            <button class="hm-arrow hm-prev" type="button" aria-label="Predchádzajúci systém">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <button class="hm-arrow hm-next" type="button" aria-label="Ďalší systém">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+
+            <div class="hm-track-viewport">
+                <ul class="hm-track" role="list">
+
+                    <!-- 1. Zrkadlo Bytia -->
+                    <li class="hm-card" data-system-key="zrkadlo-bytia" data-system-label="Zrkadlo Bytia" style="--card-accent:#6d8cff; --card-glow:rgba(109,140,255,.28);">
+                        <a href="systems/zrkadlo-bytia/index.html" style="display:block; color:inherit; text-decoration:none;">
+                            <div class="hm-card-media">
+                                <img src="" alt="Zrkadlo Bytia" draggable="false"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <svg class="hm-fallback-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+                                    <rect x="6" y="3" width="12" height="18" rx="6"/>
+                                </svg>
+                                <div class="hm-card-scan"></div>
+                            </div>
+                            <div class="hm-card-body">
+                                <span class="hm-card-num">01 · Bytie</span>
+                                <h3 class="hm-card-title" id="cardMirrorTitle">Zrkadlo Bytia</h3>
+                                <p class="hm-card-desc" id="cardMirrorDesc">Celostný odraz tvojho aktuálneho stavu bytia.</p>
+                                <span class="hm-card-cta">Otvoriť systém
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                                </span>
+                            </div>
+                        </a>
+                    </li>
+
+                    <!-- 2. Anatómia Tieňa -->
+                    <li class="hm-card" data-system-key="anatomia-tiena" data-system-label="Anatómia Tieňa" style="--card-accent:#d95a5a; --card-glow:rgba(217,90,90,.28);">
+                        <a href="systems/anatomia-tiena/index.html" style="display:block; color:inherit; text-decoration:none;">
+                            <div class="hm-card-media">
+                                <img src="" alt="Anatómia Tieňa" draggable="false"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <svg class="hm-fallback-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+                                    <path d="M12 3c4 2 7 5 7 10a7 7 0 0 1-14 0c0-5 3-8 7-10z"/><circle cx="12" cy="12" r="2.4"/>
+                                </svg>
+                                <div class="hm-card-scan"></div>
+                            </div>
+                            <div class="hm-card-body">
+                                <span class="hm-card-num">02 · Tieň</span>
+                                <h3 class="hm-card-title" id="cardAnatomiaTitle">Anatómia Tieňa</h3>
+                                <p class="hm-card-desc" id="cardAnatomiaDesc">Mapa nevedomých vzorcov, spúšťačov a obranných mechanizmov.</p>
+                                <span class="hm-card-cta">Otvoriť systém
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                                </span>
+                            </div>
+                        </a>
+                    </li>
+
+                    <!-- 2. Emočný kompas -->
+                    <li class="hm-card" data-system-key="emocny-kompas" data-system-label="Emočný kompas" style="--card-accent:#f0c080; --card-glow:rgba(240,192,128,.28);">
+                        <a href="systems/emocny-kompas/index.html" style="display:block; color:inherit; text-decoration:none;">
+                            <div class="hm-card-media">
+                                <img src="" alt="Emočný kompas" draggable="false"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <svg class="hm-fallback-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+                                    <circle cx="12" cy="12" r="9"/><path d="M15 9l-3.5 6-3-1.5L12 6l3 3z"/>
+                                </svg>
+                                <div class="hm-card-scan"></div>
+                            </div>
+                            <div class="hm-card-body">
+                                <span class="hm-card-num">03 · Emócie</span>
+                                <h3 class="hm-card-title" id="cardEmocnyTitle">Emočný kompas</h3>
+                                <p class="hm-card-desc" id="cardEmocnyDesc">Orientácia v aktuálnom emočnom poli a jeho príčinách.</p>
+                                <span class="hm-card-cta">Otvoriť systém
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                                </span>
+                            </div>
+                        </a>
+                    </li>
+
+                    <!-- 3. Vzťahový kompas -->
+                    <li class="hm-card" data-system-key="vztahovy-kompas" data-system-label="Vzťahový kompas" style="--card-accent:#f59e0b; --card-glow:rgba(245,158,11,.28);">
+                        <a href="systems/vztahovy-kompas/index.html" style="display:block; color:inherit; text-decoration:none;">
+                            <div class="hm-card-media">
+                                <img src="" alt="Vzťahový kompas" draggable="false"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <svg class="hm-fallback-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+                                    <path d="M12 20s-7-4.4-9.3-9C1.2 7.7 3 4.5 6.2 4.2 8.3 4 10 5 12 7.4 14 5 15.7 4 17.8 4.2 21 4.5 22.8 7.7 21.3 11 19 15.6 12 20 12 20z"/>
+                                </svg>
+                                <div class="hm-card-scan"></div>
+                            </div>
+                            <div class="hm-card-body">
+                                <span class="hm-card-num">04 · Vzťahy</span>
+                                <h3 class="hm-card-title" id="cardVztahTitle">Vzťahový kompas</h3>
+                                <p class="hm-card-desc" id="cardVztahDesc">Dynamika medzi tebou a druhým — kompatibilita a napätia.</p>
+                                <span class="hm-card-cta">Otvoriť systém
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                                </span>
+                            </div>
+                        </a>
+                    </li>
+
+                    <!-- 4. Integrita & Navigácia -->
+                    <li class="hm-card" data-system-key="integrita-navigacia" data-system-label="Navigátor Integrity" style="--card-accent:#38bdf8; --card-glow:rgba(56,189,248,.28);">
+                        <a href="systems/integrita-navigacia/index.html" style="display:block; color:inherit; text-decoration:none;">
+                            <div class="hm-card-media">
+                                <img src="" alt="Navigátor Integrity" draggable="false"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <svg class="hm-fallback-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+                                    <path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/>
+                                </svg>
+                                <div class="hm-card-scan"></div>
+                            </div>
+                            <div class="hm-card-body">
+                                <span class="hm-card-num">05 · Integrita</span>
+                                <h3 class="hm-card-title" id="cardIntegrityTitle">Navigátor Integrity</h3>
+                                <p class="hm-card-desc" id="cardIntegrityDesc">Diagnostika súladu medzi hodnotami, slovami a činmi.</p>
+                                <span class="hm-card-cta">Otvoriť systém
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                                </span>
+                            </div>
+                        </a>
+                    </li>
+
+                    <!-- 5. Live Core & Moon Matrix -->
+                    <li class="hm-card" data-system-key="live-core-moon" data-system-label="Live Core & Moon Matrix" style="--card-accent:#10b981; --card-glow:rgba(16,185,129,.28);">
+                        <a href="systems/live-core-moon/index.html" style="display:block; color:inherit; text-decoration:none;">
+                            <div class="hm-card-media">
+                                <img src="" alt="Live Core & Moon Matrix" draggable="false"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <svg class="hm-fallback-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+                                    <path d="M20 12.5A8.5 8.5 0 1 1 11.5 4a6.8 6.8 0 0 0 8.5 8.5z"/>
+                                </svg>
+                                <div class="hm-card-scan"></div>
+                            </div>
+                            <div class="hm-card-body">
+                                <span class="hm-card-num">06 · Live Core</span>
+                                <h3 class="hm-card-title" id="cardLiveTitle">Live Core & Moon Matrix</h3>
+                                <p class="hm-card-desc" id="cardLiveDesc">Živý prehľad energetického jadra a mesačných cyklov.</p>
+                                <span class="hm-card-cta">Otvoriť systém
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                                </span>
+                            </div>
+                        </a>
+                    </li>
+
+                    <!-- 6. Nebeský kompas -->
+                    <li class="hm-card" data-system-key="nebesky-kompas" data-system-label="Nebecký kompas" style="--card-accent:#a78bfa; --card-glow:rgba(167,139,250,.28);">
+                        <a href="systems/nebesky-kompas/index.html" style="display:block; color:inherit; text-decoration:none;">
+                            <div class="hm-card-media">
+                                <img src="" alt="Nebecký kompas" draggable="false"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <svg class="hm-fallback-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+                                    <circle cx="12" cy="12" r="9"/><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5 5l2.8 2.8M16.2 16.2L19 19M19 5l-2.8 2.8M7.8 16.2L5 19"/>
+                                </svg>
+                                <div class="hm-card-scan"></div>
+                            </div>
+                            <div class="hm-card-body">
+                                <span class="hm-card-num">06 · Nebeské</span>
+                                <h3 class="hm-card-title" id="cardNebeskyTitle">Nebecký kompas</h3>
+                                <p class="hm-card-desc" id="cardNebeskyDesc">Kosmická mapa, osudové impulzy a nebeský rytmus tvého života.</p>
+                                <span class="hm-card-cta">Otvoriť systém
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                                </span>
+                            </div>
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <div class="hm-dots"></div>
+        </div>
+    </section>
+
+    <footer class="hm-footer">
+        <span id="hubFooterBrand">The Human Maintenance</span> · <span id="hubFooterMeta">7 systémov, jedno rozhranie · potiahni prstom, ťahaj myšou alebo použi šípky</span>
+    </footer>
+
+</div>
+
+<script src="js/system-images.js"></script>
+<script src="js/carousel.js"></script>
+<script>
+    (function () {
+        const translations = {
+            sk: {
+                eyebrow: 'Self-diagnostic ecosystem',
+                title: 'The Human Maintenance',
+                intro: 'Sústava sebapoznávacích systémov na jednom mieste. Vyber si modul, prejdi diagnostikou a nechaj si zobraziť svoju mapu — každý systém má vlastný výpočet, spoločné je len rozhranie.',
+                carouselHeading: 'Vyber si systém',
+                footerBrand: 'The Human Maintenance',
+                footerMeta: '7 systémov, jedno rozhranie · potiahni prstom, ťahaj myšou alebo použi šípky',
+                cards: {
+                    anatomia: { title: 'Anatómia Tieňa', desc: 'Mapa nevedomých vzorcov, spúšťačov a obranných mechanizmov.' },
+                    emocny: { title: 'Emočný kompas', desc: 'Orientácia v aktuálnom emočnom poli a jeho príčinách.' },
+                    vztah: { title: 'Vzťahový kompas', desc: 'Dynamika medzi tebou a druhým — kompatibilita a napätia.' },
+                    integrity: { title: 'Navigátor Integrity', desc: 'Diagnostika súladu medzi hodnotami, slovami a činmi.' },
+                    live: { title: 'Live Core & Moon Matrix', desc: 'Živý prehľad energetického jadra a mesačných cyklov.' },
+                    nebesky: { title: 'Nebecký kompas', desc: 'Kosmická mapa, osudové impulzy a nebeský rytmus tvého života.' },
+                    mirror: { title: 'Zrkadlo Bytia', desc: 'Celostný odraz tvojho aktuálneho stavu bytia.' }
+                }
+            },
+            en: {
+                eyebrow: 'Self-diagnostic ecosystem',
+                title: 'The Human Maintenance',
+                intro: 'A unified ecosystem of self-diagnostic systems. Choose a module, walk through the assessment, and reveal your map — each system has its own calculation, while the interface remains shared.',
+                carouselHeading: 'Choose your system',
+                footerBrand: 'The Human Maintenance',
+                footerMeta: '7 systems, one interface · swipe, drag, or use arrow keys',
+                cards: {
+                    anatomia: { title: 'Anatomy of Shadow', desc: 'Map of unconscious patterns, triggers, and defense mechanisms.' },
+                    emocny: { title: 'Emotional Compass', desc: 'Orientation within the current emotional field and its causes.' },
+                    vztah: { title: 'Relationship Compass', desc: 'The dynamic between you and another person — compatibility and tension.' },
+                    integrity: { title: 'Integrity Navigator', desc: 'Diagnosis of alignment between values, words, and actions.' },
+                    live: { title: 'Live Core & Moon Matrix', desc: 'A live overview of energetic core and lunar cycles.' },
+                    nebesky: { title: 'Celestial Compass', desc: 'Cosmic map, fate-driven impulses, and the celestial rhythm of your life.' },
+                    mirror: { title: 'Mirror of Being', desc: 'A holistic reflection of your present state of being.' }
+                }
+            },
+            de: {
+                eyebrow: 'Selbstdiagnostisches Ökosystem',
+                title: 'The Human Maintenance',
+                intro: 'Ein einheitliches Ökosystem für Selbstdiagnostik. Wähle ein Modul, durchlaufe die Analyse und erhalte deine Karte — jedes System hat seine eigene Berechnung, gemeinsam ist nur die Oberfläche.',
+                carouselHeading: 'Wähle dein System',
+                footerBrand: 'The Human Maintenance',
+                footerMeta: '7 Systeme, eine Oberfläche · wische, ziehe oder nutze die Pfeiltasten',
+                cards: {
+                    anatomia: { title: 'Anatomie des Schattens', desc: 'Karte unbewusster Muster, Auslöser und Schutzmechanismen.' },
+                    emocny: { title: 'Emotionskompass', desc: 'Orientierung im aktuellen emotionalen Feld und seinen Ursachen.' },
+                    vztah: { title: 'Beziehungs-Kompass', desc: 'Dynamik zwischen dir und einer anderen Person — Kompatibilität und Spannungen.' },
+                    integrity: { title: 'Integritäts-Navigator', desc: 'Diagnostik der Übereinstimmung zwischen Werten, Worten und Handlungen.' },
+                    live: { title: 'Live Core & Moon Matrix', desc: 'Live-Übersicht des energetischen Kerns und der Mondzyklen.' },
+                    nebesky: { title: 'Himmelskompass', desc: 'Kosmische Karte, schicksalhafte Impulse und der himmlische Rhythmus deines Lebens.' },
+                    mirror: { title: 'Spiegel des Seins', desc: 'Ganzheitlicher Reflex deines aktuellen Seinszustands.' }
+                }
+            },
+            cz: {
+                eyebrow: 'Sebediagnostický ekosystém',
+                title: 'The Human Maintenance',
+                intro: 'Jednotný ekosystém sebepoznávacích systémů. Vyber modul, projdi diagnostikou a odhalte svoji mapu — každý systém má vlastní výpočet, společné je pouze rozhraní.',
+                carouselHeading: 'Vyber si systém',
+                footerBrand: 'The Human Maintenance',
+                footerMeta: '7 systémů, jedno rozhraní · přetáhni, táhni nebo použij šipky',
+                cards: {
+                    anatomia: { title: 'Anatomie Stínu', desc: 'Mapa nevedomých vzorců, spouštěčů a obranných mechanismů.' },
+                    emocny: { title: 'Emoční Kompas', desc: 'Orientace v aktuálním emočním poli a jeho příčinách.' },
+                    vztah: { title: 'Vztahový Kompas', desc: 'Dynamika mezi vámi a druhou osobou — kompatibilita a napětí.' },
+                    integrity: { title: 'Navigátor Integrity', desc: 'Diagnostika souladu mezi hodnotami, slovy a činy.' },
+                    live: { title: 'Live Core & Moon Matrix', desc: 'Živý přehled energetického jádra a měsíčních cyklů.' },
+                    nebesky: { title: 'Nebeský kompas', desc: 'Kosmická mapa, osudové impulzy a nebeský rytmus tvého života.' },
+                    mirror: { title: 'Zrcadlo Býtí', desc: 'Celostní odraz vašeho aktuálního stavu bytí.' }
+                }
+            }
+        };
+
+        const state = { lang: 'sk' };
+        const applyLanguage = (lang) => {
+            const t = translations[lang] || translations.sk;
+            document.getElementById('hubEyebrow').textContent = t.eyebrow;
+            document.getElementById('hubTitle').textContent = t.title;
+            document.getElementById('hubIntro').textContent = t.intro;
+            document.getElementById('hubCarouselHeading').textContent = t.carouselHeading;
+            document.getElementById('hubFooterBrand').textContent = t.footerBrand;
+            document.getElementById('hubFooterMeta').textContent = t.footerMeta;
+
+            document.getElementById('cardAnatomiaTitle').textContent = t.cards.anatomia.title;
+            document.getElementById('cardAnatomiaDesc').textContent = t.cards.anatomia.desc;
+            document.getElementById('cardEmocnyTitle').textContent = t.cards.emocny.title;
+            document.getElementById('cardEmocnyDesc').textContent = t.cards.emocny.desc;
+            document.getElementById('cardVztahTitle').textContent = t.cards.vztah.title;
+            document.getElementById('cardVztahDesc').textContent = t.cards.vztah.desc;
+            document.getElementById('cardIntegrityTitle').textContent = t.cards.integrity.title;
+            document.getElementById('cardIntegrityDesc').textContent = t.cards.integrity.desc;
+            document.getElementById('cardLiveTitle').textContent = t.cards.live.title;
+            document.getElementById('cardLiveDesc').textContent = t.cards.live.desc;
+            document.getElementById('cardNebeskyTitle').textContent = t.cards.nebesky.title;
+            document.getElementById('cardNebeskyDesc').textContent = t.cards.nebesky.desc;
+            document.getElementById('cardMirrorTitle').textContent = t.cards.mirror.title;
+            document.getElementById('cardMirrorDesc').textContent = t.cards.mirror.desc;
+
+            document.querySelectorAll('#hmLangSelector button').forEach((button) => {
+                button.classList.toggle('active', button.dataset.lang === lang);
+            });
+        };
+
+        document.querySelectorAll('#hmLangSelector button').forEach((button) => {
+            button.addEventListener('click', () => {
+                state.lang = button.dataset.lang;
+                applyLanguage(state.lang);
+            });
+        });
+
+        applyLanguage(state.lang);
+    })();
+</script>
+</body>
+</html>

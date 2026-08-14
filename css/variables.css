@@ -1,0 +1,17 @@
+:root {
+    --bg: #060810;
+    --card: #0d1428;
+    --border: #2a1a2a;
+    --text: #e8edf5;
+    --muted: #7a5a6a;
+    --accent: #d95a5a;
+    --glow: rgba(217, 90, 90, 0.2);
+    --radius: 18px;
+}
+
+body.female {
+    --accent: #f472b6;
+    --glow: rgba(244, 114, 182, 0.2);
+    --border: #3a1a2a;
+    --muted: #9a6a7a;
+}
